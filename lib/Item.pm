@@ -61,6 +61,9 @@ our $VERSION = 0.001;
     sub _get_datetime_obj {        
         my @date = split /-/, shift;
 
+        #$date[1] =~ s{^0}{}xms;
+        #$date[2] =~ s{^0}{}xms;
+
         return DateTime->new(
             year  => $date[0],
             month => $date[1],
