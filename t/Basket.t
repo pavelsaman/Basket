@@ -99,7 +99,7 @@ my $items = $basket->get_items();
 my $categories = $basket->get_categories();
 
 is(scalar @$items, 4);
-is(scalar @$categories, 3);
+is(scalar @$categories, 2);
 
 # missing text
 
@@ -119,20 +119,20 @@ my $items = $basket->get_items();
 my $categories = $basket->get_categories();
 
 is(scalar @$items, 3);
-is(scalar @$categories, 3);
+is(scalar @$categories, 2);
 
 ###############################################################################
 # delete_category
 
 $basket->delete_category({
-    category => q{garage}
+    category => q{electronics}
 });
 
 my $items = $basket->get_items();
 my $categories = $basket->get_categories();
 
-is(scalar @$items, 3);
-is(scalar @$categories, 2);
+is(scalar @$items, 2);
+is(scalar @$categories, 1);
 
 # missing category
 

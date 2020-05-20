@@ -18,7 +18,7 @@ is(scalar @$categories, 2);
 # save new item
 $basket->add_item({
     text     => q{raspberry},
-    category => q{electroncis}
+    category => q{electronics}
 });
 
 # add new category

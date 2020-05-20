@@ -175,12 +175,24 @@ our $VERSION = 0.001;
         if (defined $args_ref->{category}) {
             delete $basket{ident $self}->{
                 $args_ref->{category}}->{items}->{$args_ref->{text}};
-        }
-        else {
-            foreach my $cat (values %{ $basket{ident $self} }) {
-                delete $cat->{items}->{$args_ref->{text}};
+
+            # delete the whole category if it's empty
+            if (scalar keys %{ $basket{ident $self}->{
+                $args_ref->{category}}->{items} } == EMPTY) {
+                $self->delete_category({ category => $args_ref->{category} });
             }
         }
+        else {
+            foreach my $cat (keys %{ $basket{ident $self} }) {
+                delete $basket{ident $self}->{$cat}->{items}->{
+                    $args_ref->{text}};
+
+                # delete the whole category if it's empty
+                if (scalar keys %{ $basket{ident $self}->{$cat}->{items} } == EMPTY) {
+                    $self->delete_category({ category => $cat });
+                }
+            }
+        }       
 
         $saved{ident $self} = NOT_SAVED;
         return;
@@ -263,9 +275,8 @@ our $VERSION = 0.001;
 
         BASKET_FILE:
         while (my $cat_file = readdir $basket_dir) {
-            next BASKET_FILE if -d $cat_file;                       
-
-            print $cat_file, "\n";
+            next BASKET_FILE if -d $cat_file;                   
+            
             rename $dir{ident $self} . q{/} . $cat_file,
                    $dir{ident $self} . q{/} . $cat_file . q{.bak};   
         }        
@@ -282,8 +293,23 @@ our $VERSION = 0.001;
             open my $cat_file, q{>}, $dir{ident $self} . q{/} . $cat
                 or next CATEGORY; 
 
+            # save all items
+            foreach my $item (keys %{ $basket{ident $self}->{$cat}->{items} }) {
+                printf $cat_file "\"%s\";%s\n", $item
+                    , $basket{ident $self}->{$cat}->{items}
+                        ->{$item}->get_added_on();
+            }
+
             close $cat_file;
         }
+
+        return;
+    }
+
+    sub _delete_backup_files :PRIVATE {
+        my $self = shift;
+
+        unlink glob $dir{ident $self} . q{/} . q{*.bak};
 
         return;
     }
@@ -292,12 +318,13 @@ our $VERSION = 0.001;
         my $self = shift;
 
         # create backup files == rename current ones
-        #$self->_raname_files();
+        $self->_raname_files();
 
         # create new files
         $self->_dump();
 
         # delete backup files
+        $self->_delete_backup_files();
 
         $saved{ident $self} = SAVED;
         return;
