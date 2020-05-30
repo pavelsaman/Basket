@@ -6,7 +6,7 @@ use Readonly;
 use DateTime;
 use Class::Std;
 use Carp qw(croak);
-use List::MoreUtils qw(any);
+use List::MoreUtils qw(duplicates);
 use Item 0.001;
 use Category 0.001;
 
@@ -215,60 +215,83 @@ our $VERSION = 0.001;
     sub list {
         my $self     = shift;
         my $args_ref = shift;
+ 
+        my $result = {};    
 
-        use Storable qw(dclone);
-
-        my $set = $basket{ident $self};        
-        
-        # filter based on:
-        ## category names
-        if (defined $args_ref->{categories}) {
-            foreach my $cat (keys %$set ) {
-                if (not any{ $_ eq $cat } @{ $args_ref->{categories} }) {
-                    delete $set->{$cat};
-                }
-            }
-        }
-        ## dates after
-        if (defined $args_ref->{after}) {            
+        if (not defined $args_ref->{before}
+            and not defined $args_ref->{after}) {
             # go over all categories
-            foreach my $cat (keys %$set) {
+            foreach my $cat (keys %{ $basket{ident $self} }) {            
                 # go over all items
-                foreach my $item (keys %{ $set->{$cat}->{items} }) {                    
-                    # delete those not older than
-                    if (not $set->{$cat}->{items}->{$item}
-                        ->is_newer_than($args_ref->{after})) {
-                        delete $set->{$cat}->{items}->{$item};
+                foreach my $item (keys %{ $basket{
+                    ident $self}->{$cat}->{items} }) {                    
+                    # delete those not older than                    
+                    my $it = $basket{ident $self}->{$cat}->{items}->{$item};
+                    push @{ $result->{$cat} }, join q{;},
+                        $it->get_text(), 
+                        $it->get_added_on()
+                    ;        
+                }               
+            }
+
+            return $result;
+        }     
+
+        if (defined $args_ref->{after}) {  
+            # go over all categories          
+            foreach my $cat (keys %{ $basket{ident $self} }) {            
+                # go over all items
+                foreach my $item (keys %{ $basket{
+                    ident $self}->{$cat}->{items} }) {              
+                    my $it = $basket{ident $self}->{$cat}->{items}->{$item};
+                    if ($it->is_newer_than($args_ref->{after})) {                        
+                        push @{ $result->{$cat} }, join q{;},
+                            $it->get_text(), 
+                            $it->get_added_on()
+                        ;                    
                     }
                 }
 
-                # delete whole category is empty (== no items in it)
-                if (scalar keys %{ $set->{$cat}->{items} } == EMPTY) {
-                    delete $set->{$cat};
-                }
+                _prune_empty_categories($result);
             }
-        }
-        ## dates before
+        }        
         if (defined $args_ref->{before}) {
             # go over all categories
-            foreach my $cat (keys %$set) {
+            foreach my $cat (keys %{ $basket{ident $self} }) {            
                 # go over all items
-                foreach my $item (keys %{ $set->{$cat}->{items} }) {
-                    # delete those not older than
-                    if (not $set->{$cat}->{items}->{$item}
-                        ->is_older_than($args_ref->{before})) {
-                        delete $set->{$cat}->{items}->{$item};
+                foreach my $item (keys %{ $basket{
+                    ident $self}->{$cat}->{items} }) {                    
+                    my $it = $basket{ident $self}->{$cat}->{items}->{$item};
+                    if ($it->is_older_than($args_ref->{before})) {                        
+                        push @{ $result->{$cat} }, join q{;},
+                            $it->get_text(), 
+                            $it->get_added_on()
+                        ;                    
                     }
-                }
+                }         
 
-                # delete whole category is empty (== no items in it)
-                if (scalar keys %{ $set->{$cat}->{items} } == EMPTY) {
-                    delete $set->{$cat};
-                }
+                # chose only those that comply to both before and after dates
+                if (defined $args_ref->{after}) {
+                    $result->{$cat} = [ duplicates @{ $result->{$cat} }];
+                }      
+
+                _prune_empty_categories($result);
+            }
+        }        
+
+        return $result;
+    }
+
+    sub _prune_empty_categories {
+        my $data_ref = shift;
+
+        foreach my $key (keys %$data_ref) {
+            if (scalar @{ $data_ref->{$key} } == EMPTY) {
+                delete $data_ref->{$key};
             }
         }
 
-        return $set;
+        return;
     }
 
     sub _raname_files :PRIVATE {

@@ -6,7 +6,7 @@ use warnings;
 use Readonly;
 use Pod::Usage;
 use Getopt::Long;
-use List::MoreUtils qw(after uniq);
+use List::MoreUtils qw(uniq);
 use lib './lib';
 use Basket 0.001;
 
@@ -16,6 +16,8 @@ Usage: basket
 END_USAGE
 
     printf "%s", $usage_line;
+
+    return;
 }
 
 sub print_help {
@@ -30,14 +32,38 @@ END_HELP_MSG_END
     printf "%s\n", $help_message_start;
     print_usage();
     printf "\n%s", $help_message_end;
+
+    return;
 }
 
 sub print_version {
     printf "%s: %.3f\n", qq{basket version:}, qq{$Basket::VERSION};
+
+    return;
 }
 
 sub print_man {
     pod2usage(-exitval => 0, -verbose => 2);
+}
+
+sub pretty_print {
+    my $data_ref    = shift;
+    my $print_dates = shift;
+
+    foreach my $cat (keys %$data_ref) {
+        printf "%s:\n", $cat;
+        foreach my $item (@{ $data_ref->{$cat}} ) {
+            my @item_parts = split /;/, $item;
+            printf " %s", $item_parts[0];
+            if ($print_dates) {
+                printf ";%s", $item_parts[1];
+            }
+
+            print "\n";
+        }
+    }
+
+    return;
 }
 
 ###############################################################################
@@ -68,8 +94,6 @@ if (scalar @given_verbs != 1) {
     exit 1;
 }
 
-use Data::Dumper;
-
 my $basket = Basket->new({ dir => "./bin/files"});
 
 if ($list) {
@@ -90,7 +114,7 @@ if ($list) {
         $result = $basket->list({ before => $before, after => $after});
     }
     
-    print Dumper $result;
+    pretty_print($result, $with_dates);
 }
 elsif ($add) {
     # both item(s) and category(ies) have to be specified
@@ -130,5 +154,8 @@ else {
         $basket->delete_item({ category => $categories[0], text => $items[0] });
     }
 }
+
+# save changes
+$basket->save();
 
 exit 0;
