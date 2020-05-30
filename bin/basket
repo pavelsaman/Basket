@@ -1,0 +1,134 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Readonly;
+use Pod::Usage;
+use Getopt::Long;
+use List::MoreUtils qw(after uniq);
+use lib './lib';
+use Basket 0.001;
+
+sub print_usage {
+    my $usage_line = <<'END_USAGE';
+Usage: basket 
+END_USAGE
+
+    printf "%s", $usage_line;
+}
+
+sub print_help {
+    my $help_message_start = <<'END_HELP_MSG_START';
+Basket - keep track of your shopping lists
+END_HELP_MSG_START
+    my $help_message_end = <<'END_HELP_MSG_END';
+Options:
+    
+END_HELP_MSG_END
+
+    printf "%s\n", $help_message_start;
+    print_usage();
+    printf "\n%s", $help_message_end;
+}
+
+sub print_version {
+    printf "%s: %.3f\n", qq{basket version:}, qq{$Basket::VERSION};
+}
+
+sub print_man {
+    pod2usage(-exitval => 0, -verbose => 2);
+}
+
+###############################################################################
+
+# get command line options
+my $result = GetOptions(
+    # meta-options
+    'usage'              => sub { print_usage();   exit 0; },
+    'help'               => sub { print_help();    exit 0; },
+    'version'            => sub { print_version(); exit 0; },
+    'man'                => sub { print_man();     exit 0; },
+    # behavioral options
+    'l|list'             => \ my $list,
+    'add'                => \ my $add,
+    'rm|delete'          => \ my $delete,
+    'item=s{1,}'         => \ my @items,
+    'cat|category=s{1,}' => \ my @categories,
+    'after=s'            => \ my $after,
+    'before=s'           => \ my $before,
+    'dates'              => \ my $with_dates
+);
+
+# exactly one of --list, --delete, --add has to be given on the command line
+my @given_verbs = grep { $_ } ($list, $add, $delete);
+
+if (scalar @given_verbs != 1) {
+    print_usage();
+    exit 1;
+}
+
+use Data::Dumper;
+
+my $basket = Basket->new({ dir => "./bin/files"});
+
+if ($list) {
+    if (scalar @items != 0) {
+        print_usage();
+        exit 1;
+    }
+
+    my $result;    
+    if (scalar @categories > 0) {
+        $result = $basket->list({
+            categories => [uniq @categories],
+            before     => $before,
+            after      => $after
+        });
+    }
+    else {
+        $result = $basket->list({ before => $before, after => $after});
+    }
+    
+    print Dumper $result;
+}
+elsif ($add) {
+    # both item(s) and category(ies) have to be specified
+    # maximum 1 category can be specified
+    if (scalar @items == 0 or scalar @categories != 1) {
+        print_usage();
+        exit 1;
+    }
+
+    # add all items into basket
+    foreach my $item (@items) {
+        $basket->add_item({ category => $categories[0], text => $item });
+    }
+}
+else {
+    # either item(s) or category(ies) has to be specified
+    if ((scalar @items > 1 and scalar @categories > 1)
+        or (scalar @items == 0 and scalar @categories == 0)) {
+        print_usage();
+        exit 1;
+    }
+    
+    # more items (from whatever categories) to delete
+    if (scalar @items > 0 and scalar @categories == 0) {
+        foreach my $item (@items) {
+            $basket->delete_item({ text => $item });
+        }
+    }
+    # more categoried to delete
+    elsif (scalar @categories > 0 and scalar @items == 0) {
+        foreach my $category (@categories) {
+            $basket->delete_category({ category => $category });
+        }
+    }
+    # one category and one item given
+    else {
+        $basket->delete_item({ category => $categories[0], text => $items[0] });
+    }
+}
+
+exit 0;

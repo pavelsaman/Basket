@@ -216,56 +216,59 @@ our $VERSION = 0.001;
         my $self     = shift;
         my $args_ref = shift;
 
-        my %set = %{ $basket{ident $self} };
+        use Storable qw(dclone);
+
+        my $set = $basket{ident $self};        
+        
         # filter based on:
         ## category names
         if (defined $args_ref->{categories}) {
-            foreach my $cat (keys %set ) {
+            foreach my $cat (keys %$set ) {
                 if (not any{ $_ eq $cat } @{ $args_ref->{categories} }) {
-                    delete $set{$cat};
+                    delete $set->{$cat};
                 }
             }
         }
         ## dates after
-        if (defined $args_ref->{after}) {
+        if (defined $args_ref->{after}) {            
             # go over all categories
-            foreach my $cat (keys %set) {
+            foreach my $cat (keys %$set) {
                 # go over all items
-                foreach my $item (keys %{ $set{$cat}->{items} }) {
+                foreach my $item (keys %{ $set->{$cat}->{items} }) {                    
                     # delete those not older than
-                    if (not $set{$cat}->{items}->{$item}
+                    if (not $set->{$cat}->{items}->{$item}
                         ->is_newer_than($args_ref->{after})) {
-                        delete $set{$cat}->{items}->{$item};
+                        delete $set->{$cat}->{items}->{$item};
                     }
                 }
 
                 # delete whole category is empty (== no items in it)
-                if (scalar keys %{ $set{$cat}->{items} } == EMPTY) {
-                    delete $set{$cat};
+                if (scalar keys %{ $set->{$cat}->{items} } == EMPTY) {
+                    delete $set->{$cat};
                 }
             }
         }
         ## dates before
         if (defined $args_ref->{before}) {
             # go over all categories
-            foreach my $cat (keys %set) {
+            foreach my $cat (keys %$set) {
                 # go over all items
-                foreach my $item (keys %{ $set{$cat}->{items} }) {
+                foreach my $item (keys %{ $set->{$cat}->{items} }) {
                     # delete those not older than
-                    if (not $set{$cat}->{items}->{$item}
+                    if (not $set->{$cat}->{items}->{$item}
                         ->is_older_than($args_ref->{before})) {
-                        delete $set{$cat}->{items}->{$item};
+                        delete $set->{$cat}->{items}->{$item};
                     }
                 }
 
                 # delete whole category is empty (== no items in it)
-                if (scalar keys %{ $set{$cat}->{items} } == EMPTY) {
-                    delete $set{$cat};
+                if (scalar keys %{ $set->{$cat}->{items} } == EMPTY) {
+                    delete $set->{$cat};
                 }
             }
         }
 
-        return \%set;
+        return $set;
     }
 
     sub _raname_files :PRIVATE {

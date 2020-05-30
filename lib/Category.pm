@@ -8,7 +8,7 @@ use Hash::Util qw(hash_value);
 our $VERSION = 0.001;
 
 {
-    my %name       :ATTR( :get<name> );
+    my %name :ATTR( :get<name> );
 
     sub BUILD {
         my ($self, $ident, $args_ref) = @_;
