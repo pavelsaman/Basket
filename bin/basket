@@ -8,11 +8,13 @@ use Pod::Usage;
 use Getopt::Long;
 use List::MoreUtils qw(uniq);
 use lib './lib';
-use Basket 0.001;
+use Basket 0.002;
 
 sub print_usage {
     my $usage_line = <<'END_USAGE';
-Usage: basket 
+Usage: basket [-l [-c category --before date --after date --dates]
+               | -a -c category -i item
+               | -d <-c category [ -i item ] | -i item>]
 END_USAGE
 
     printf "%s", $usage_line;
@@ -26,7 +28,30 @@ Basket - keep track of your shopping lists
 END_HELP_MSG_START
     my $help_message_end = <<'END_HELP_MSG_END';
 Options:
-    
+    -l|--list       Lists all items, could be combined with:
+                     -c|--category, --before, --after, --dates
+    -a|--add        Adds a new item into a specified category
+    -d|--delete     Deletes either the whole category (and therefore
+                     all its items) or one item within a specified
+                     category.
+
+    -c|--category   Specifies a category name, could be used with --list,
+                     has to be used with --add and --delete. Could re repeated
+                     when used with --list and --delete without --item.
+    -i|--item       Specifies an item, has to be used with --add and
+                     with --delete when no --category is specified. Could be 
+                     used with --delete when --category is specified.
+    --before        Filters only items added before a certain date. Could 
+                     be used with --list.
+    --after         Filters only items added after a certain date. Could 
+                     be used with --list.
+    --dates         Prints when items were added along with their names. Could 
+                     be used with --list.
+
+    --usage         Prints the usage line.
+    --help          Prints this message.
+    --man           Prints the whole man page.
+    --version       Prints the current version.    
 END_HELP_MSG_END
 
     printf "%s\n", $help_message_start;
@@ -71,19 +96,19 @@ sub pretty_print {
 # get command line options
 my $result = GetOptions(
     # meta-options
-    'usage'              => sub { print_usage();   exit 0; },
-    'help'               => sub { print_help();    exit 0; },
-    'version'            => sub { print_version(); exit 0; },
-    'man'                => sub { print_man();     exit 0; },
+    'usage'                => sub { print_usage();   exit 0; },
+    'help'                 => sub { print_help();    exit 0; },
+    'version'              => sub { print_version(); exit 0; },
+    'man'                  => sub { print_man();     exit 0; },
     # behavioral options
-    'l|list'             => \ my $list,
-    'add'                => \ my $add,
-    'rm|delete'          => \ my $delete,
-    'item=s{1,}'         => \ my @items,
-    'cat|category=s{1,}' => \ my @categories,
-    'after=s'            => \ my $after,
-    'before=s'           => \ my $before,
-    'dates'              => \ my $with_dates
+    'l|list'               => \ my $list,
+    'a|add'                => \ my $add,
+    'd|delete'             => \ my $delete,
+    'i|item=s{1,}'         => \ my @items,
+    'c|cat|category=s{1,}' => \ my @categories,
+    'after=s'              => \ my $after,
+    'before=s'             => \ my $before,
+    'dates'                => \ my $with_dates
 );
 
 # exactly one of --list, --delete, --add has to be given on the command line
@@ -143,7 +168,7 @@ else {
             $basket->delete_item({ text => $item });
         }
     }
-    # more categoried to delete
+    # more categories to delete
     elsif (scalar @categories > 0 and scalar @items == 0) {
         foreach my $category (@categories) {
             $basket->delete_category({ category => $category });

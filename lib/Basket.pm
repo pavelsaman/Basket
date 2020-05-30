@@ -6,11 +6,11 @@ use Readonly;
 use DateTime;
 use Class::Std;
 use Carp qw(croak);
-use List::MoreUtils qw(duplicates);
+use List::MoreUtils qw(duplicates any);
 use Item 0.001;
 use Category 0.001;
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 {
     sub SAVED     :PRIVATE { 1 };
@@ -188,7 +188,8 @@ our $VERSION = 0.001;
                     $args_ref->{text}};
 
                 # delete the whole category if it's empty
-                if (scalar keys %{ $basket{ident $self}->{$cat}->{items} } == EMPTY) {
+                if (scalar keys %{ $basket{
+                    ident $self}->{$cat}->{items} } == EMPTY) {
                     $self->delete_category({ category => $cat });
                 }
             }
@@ -214,70 +215,55 @@ our $VERSION = 0.001;
 
     sub list {
         my $self     = shift;
-        my $args_ref = shift;
- 
-        my $result = {};    
+        my $args_ref = shift; 
+        my $result   = {};                
 
-        if (not defined $args_ref->{before}
-            and not defined $args_ref->{after}) {
-            # go over all categories
-            foreach my $cat (keys %{ $basket{ident $self} }) {            
-                # go over all items
-                foreach my $item (keys %{ $basket{
-                    ident $self}->{$cat}->{items} }) {                    
-                    # delete those not older than                    
-                    my $it = $basket{ident $self}->{$cat}->{items}->{$item};
-                    push @{ $result->{$cat} }, join q{;},
-                        $it->get_text(), 
-                        $it->get_added_on()
-                    ;        
-                }               
-            }
-
-            return $result;
-        }     
-
-        if (defined $args_ref->{after}) {  
-            # go over all categories          
-            foreach my $cat (keys %{ $basket{ident $self} }) {            
-                # go over all items
-                foreach my $item (keys %{ $basket{
-                    ident $self}->{$cat}->{items} }) {              
-                    my $it = $basket{ident $self}->{$cat}->{items}->{$item};
+        # go over all categories        
+        CATEGORY:  
+        foreach my $cat (@{ $self->get_category_names() }) {  
+            next CATEGORY if defined $args_ref->{categories}
+                and scalar @{ $args_ref->{categories} } > 0
+                and not any { $_ eq $cat } @{ $args_ref->{categories} }
+            ;         
+            # go over all items
+            foreach my $item (keys %{ $basket{
+                ident $self}->{$cat}->{items} }) {              
+                my $it = $basket{ident $self}->{$cat}->{items}->{$item};
+                
+                if (defined $args_ref->{after}) {
                     if ($it->is_newer_than($args_ref->{after})) {                        
                         push @{ $result->{$cat} }, join q{;},
                             $it->get_text(), 
                             $it->get_added_on()
-                        ;                    
-                    }
-                }
-
-                _prune_empty_categories($result);
-            }
-        }        
-        if (defined $args_ref->{before}) {
-            # go over all categories
-            foreach my $cat (keys %{ $basket{ident $self} }) {            
-                # go over all items
-                foreach my $item (keys %{ $basket{
-                    ident $self}->{$cat}->{items} }) {                    
-                    my $it = $basket{ident $self}->{$cat}->{items}->{$item};
+                        ; 
+                    }                                 
+                }                
+                if (defined $args_ref->{before}) {
                     if ($it->is_older_than($args_ref->{before})) {                        
                         push @{ $result->{$cat} }, join q{;},
                             $it->get_text(), 
                             $it->get_added_on()
-                        ;                    
-                    }
-                }         
+                        ;    
+                    }                                  
+                }
+                if (not defined $args_ref->{before}
+                    and not defined $args_ref->{after}) {
+                    push @{ $result->{$cat} }, join q{;},
+                        $it->get_text(), 
+                        $it->get_added_on()
+                    ;
+                }
+            }            
 
-                # chose only those that comply to both before and after dates
-                if (defined $args_ref->{after}) {
-                    $result->{$cat} = [ duplicates @{ $result->{$cat} }];
-                }      
-
-                _prune_empty_categories($result);
+            # if both before and after are specified, chose only values
+            # that comply to both conditions
+            if (defined $args_ref->{before}
+                and defined $args_ref->{after}) {
+                $result->{$cat} = [ duplicates @{ $result->{$cat} }];
             }
-        }        
+
+            _prune_empty_categories($result);
+        }              
 
         return $result;
     }
