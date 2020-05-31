@@ -1,0 +1,10 @@
+Revision history of basket app
+
+0.002  2020-05-31 12:00:00  CZE/Prague
+
+    - initial stable version with all documentation,
+      more tests, Makefile.PL
+
+0.001  2020-05-30 17:00:00  CZE/Prague
+
+    - initial version

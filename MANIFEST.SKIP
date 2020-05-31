@@ -1,0 +1,5 @@
+examples/
+bin/files/
+.git/
+.gitignore
+Makefile

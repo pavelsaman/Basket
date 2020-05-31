@@ -1,0 +1,154 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Basket - keep track of your shopping lists</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXAMPLES">EXAMPLES</a></li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#REPOSITORY">REPOSITORY</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#LICENCE-AND-COPYRIGHT">LICENCE AND COPYRIGHT</a></li>
+  <li><a href="#DISCLAIMER-OF-WARRANTY">DISCLAIMER OF WARRANTY</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Basket - keep track of your shopping lists</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>This document describes version 0.002</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    Usage: basket [-l [-c category --before date --after date --dates]
+                   | -a -c category -i item
+                   | -d &lt;-c category [ -i item ] | -i item&gt;]
+
+    Options:
+        -l|--list       Lists all items, could be combined with:
+                         -c|--category, --before, --after, --dates
+        -a|--add        Adds a new item into a specified category
+        -d|--delete     Deletes either the whole category (and therefore
+                         all its items) or one item within a specified
+                         category.
+
+        -c|--category   Specifies a category name, could be used with --list,
+                         has to be used with --add and --delete. Could be repeated
+                         when used with --list and --delete without --item.
+        -i|--item       Specifies an item, has to be used with --add and
+                         with --delete when no --category is specified. Could be 
+                         used with --delete when --category is specified.
+        --before        Filters only items added before a certain date. Could 
+                         be used with --list.
+        --after         Filters only items added after a certain date. Could 
+                         be used with --list.
+        --dates         Prints when items were added along with their names. Could 
+                         be used with --list.
+
+        --usage         Prints the usage line.
+        --help          Prints this message.
+        --man           Prints the whole man page.
+        --version       Prints the current version.</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The <b>basket</b> application takes care of your shopping lists in a text form. You can add items to categories, you can delete them, and of course list them at your will.</p>
+
+<p>The app provides three main verbs that represent three actions that you can perform with your shopping lists:</p>
+
+<pre><code>    --list
+    --add
+    --delete</code></pre>
+
+<p>For more information on how to use them, see the Examples section, SYNOPSIS, help, or usage.</p>
+
+<p>This application requires you set up an environment variable <b>BASKET_DIR</b> with a path to a directory where shopping lists will be stored. If not set, the app will inform you upon startup and exit with an error code 1.</p>
+
+<h1 id="EXAMPLES">EXAMPLES</h1>
+
+<p>To add a new item to category electronics:</p>
+
+<pre><code>    $ basket --add --category electronics --item keyboard
+    $ basket -a -c electronics -i keyboard</code></pre>
+
+<p>To see every item in every category: $ basket --list $ basket -l</p>
+
+<p>To see every item in category electronics:</p>
+
+<pre><code>    $ basket -l -c electronics</code></pre>
+
+<p>To see every item added between 1st of March and 1st of April in category electronics:</p>
+
+<pre><code>    $ basket -l -c electronics --after 2020-03-01 --before 2020-04-01</code></pre>
+
+<p>To see everything after 1st of March:</p>
+
+<pre><code>    $ basket -l --after 2020-03-01</code></pre>
+
+<p>To add dates (of when items were added) to the previous output:</p>
+
+<pre><code>    $ basket -l -c electronics --after 2020-03-01 --before 2020-04-01 --dates</code></pre>
+
+<p>To delete one item from one category:</p>
+
+<pre><code>    $ basket --delete -i keyboard -c electronics
+    $ basket -d -i keyboard -c electronics</code></pre>
+
+<p>To delete more items from all categories:</p>
+
+<pre><code>    $ bsket -d -i keyboard -i &quot;cisco router&quot;</code></pre>
+
+<p>To delete one category (and therefore all items from it):</p>
+
+<pre><code>    $ basket -d -c electronics</code></pre>
+
+<p>To delete more categories (and all items in them):</p>
+
+<pre><code>    $ basket -d -c electronics -c kitchen</code></pre>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
+<p>No bugs have been reported.</p>
+
+<p>Please report any bugs or feature requests to <code>pavelsam@centrum.cz</code>.</p>
+
+<h1 id="REPOSITORY">REPOSITORY</h1>
+
+<p><a href="https://github.com/pavelsaman/Basket">https://github.com/pavelsaman/Basket</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Pavel Saman <code>pavelsam@centrum.cz</code></p>
+
+<h1 id="LICENCE-AND-COPYRIGHT">LICENCE AND COPYRIGHT</h1>
+
+<p>Copyright &copy; 2020, Pavel Saman <code>pavelsam@centrum.cz</code>. All rights reserved.</p>
+
+<p>This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<h1 id="DISCLAIMER-OF-WARRANTY">DISCLAIMER OF WARRANTY</h1>
+
+<p>BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE &quot;AS IS&quot; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.</p>
+
+<p>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+
+
+</body>
+
+</html>
+
+
