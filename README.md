@@ -23,6 +23,8 @@ will inform you upon startup and exit with an error code 1.
 
 ## Instalation
 
+First get the current version - either clone this repository and use actual master branch, or download the last release.
+
 ```
 $ perl Makefile.PL
 $ make
