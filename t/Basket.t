@@ -30,6 +30,15 @@ is($basket, undef);
 like($error, qr/no dir/);
 
 ###############################################################################
+# wrong dir
+
+my $basket = eval{ Basket->new({ dir => q{./t/dummy_file} }) };
+my $error = $@;
+
+is($basket, undef);
+like($error, qr/It is not possible to read from dir in BASKET_DIR/);
+
+###############################################################################
 # get_categories
 
 my $basket = Basket->new({ dir => q{./t/dummy_files} });

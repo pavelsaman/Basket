@@ -3,3 +3,4 @@ bin/files/
 .git/
 .gitignore
 to.do
+blib/

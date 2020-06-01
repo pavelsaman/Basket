@@ -10,7 +10,7 @@ use List::MoreUtils qw(duplicates any);
 use Item 0.002;
 use Category 0.001;
 
-our $VERSION = 0.003;
+our $VERSION = 0.004;
 
 {
     sub SAVED     :PRIVATE { 1 };
@@ -41,7 +41,10 @@ our $VERSION = 0.003;
     sub _parse_files :PRIVATE {
         my $self = shift;
 
-        opendir my $basket_dir, $dir{ident $self};
+        opendir my $basket_dir, $dir{ident $self}
+            or croak "It is not possible to read from dir in BASKET_DIR.\n"
+                . "Please check it is set up correctly.\n"
+        ;
 
         BASKET_FILE:
         while (my $cat_file = readdir $basket_dir) {
