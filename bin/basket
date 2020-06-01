@@ -169,23 +169,19 @@ else {
         or (scalar @items == 0 and scalar @categories == 0)) {
         print_usage();
         exit 1;
-    }
+    }    
     
-    # more items (from whatever categories) to delete
-    if (scalar @items > 0 and scalar @categories == 0) {
-        foreach my $item (@items) {
-            $basket->delete_item({ text => $item });
-        }
-    }
     # more categories to delete
-    elsif (scalar @categories > 0 and scalar @items == 0) {
+    if (scalar @categories > 0 and scalar @items == 0) {
         foreach my $category (@categories) {
             $basket->delete_category({ category => $category });
         }
     }
-    # one category and one item given
+    # delete item(s) from one category
     else {
-        $basket->delete_item({ category => $categories[0], text => $items[0] });
+        foreach my $item (@items) {
+            $basket->delete_item({ category => $categories[0], text => $item });
+        }        
     }
 }
 
