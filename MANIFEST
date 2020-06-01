@@ -4,6 +4,7 @@ doc/basket-man-page.html
 lib/Basket.pm
 lib/Category.pm
 lib/Item.pm
+Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 MYMETA.json
@@ -15,4 +16,5 @@ t/dummy_files/electronics
 t/dummy_files/kitchen
 t/Item.t
 t/list_Basket.t
+t/quantity_Basket.t
 t/save_Basket.t

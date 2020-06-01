@@ -7,7 +7,7 @@ use DateTime;
 use Class::Std;
 use Hash::Util qw(hash_value);
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 {
     Readonly my $year_part  => 0;
@@ -20,14 +20,16 @@ our $VERSION = 0.001;
     my %text         :ATTR( :get<text>     );
     my %added        :ATTR( :get<added_on> );
     my %hash_value   :ATTR( :get<hash>     );
+    my %quantity     :ATTR( :get<quantity> );
 
     sub BUILD {
         my ($self, $ident, $args_ref) = @_;
 
-        $text{$ident} = $args_ref->{text};
-        $added{$ident} = $args_ref->{added};
+        $text{$ident}       = $args_ref->{text};
+        $added{$ident}      = $args_ref->{added};
+        $quantity{$ident}   = $args_ref->{quantity};
         $hash_value{$ident} = hash_value(
-            join q{}, $text{$ident}, $added{$ident}
+            join q{}, $text{$ident}, $added{$ident}, $quantity{$ident}
         );
 
         return;
@@ -38,6 +40,21 @@ our $VERSION = 0.001;
         my $part = shift;
 
         return (split /-/, $added{ident $self})[$part];
+    }
+
+    sub increase_quantity {
+        my $self = shift;
+
+        $quantity{ident $self} += 1;
+        return;
+    }
+
+    sub set_added_on {
+        my $self         = shift;
+        my $new_added_on = shift;
+
+        $added{ident $self} = $new_added_on;
+        return;
     }
 
     sub get_year {

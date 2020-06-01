@@ -4,7 +4,11 @@ use Item;
 
 ###############################################################################
 
-my $item = Item->new({ text => q{RJ45 cable}, added => q{2020-05-10} });
+my $item = Item->new({
+    text     => q{RJ45 cable},
+    added    => q{2020-05-10},
+    quantity => q{1}
+});
 
 isa_ok($item, q{Item});
 is($item->get_text(), q{RJ45 cable});

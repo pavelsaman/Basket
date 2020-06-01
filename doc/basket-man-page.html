@@ -30,7 +30,7 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>This document describes version 0.003</p>
+<p>This document describes version 0.004</p>
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
@@ -124,6 +124,20 @@
 <p>To delete more categories (and all items in them):</p>
 
 <pre><code>    $ basket -d -c electronics -c kitchen</code></pre>
+
+<p>You can add more same items, if you print out your shopping list then, it will show up in the output like so:</p>
+
+<pre><code>    $ basket -l
+
+        electronics:
+
+         2x RJ-45 cable</code></pre>
+
+<p>The quantity shows up only if you have more items on your shopping list. If you delete such an item:</p>
+
+<pre><code>    $ basket -d -c electronics -i &quot;RJ-45 cable&quot;</code></pre>
+
+<p>it will wipe it out completely, <i>NOT</i> descrease the quantity.</p>
 
 <h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
 

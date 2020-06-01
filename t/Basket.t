@@ -1,5 +1,6 @@
 use Test::More qw(no_plan);
 use List::MoreUtils qw(any);
+use DateTime;
 
 use Basket;
 
@@ -66,6 +67,23 @@ my $categories = $basket->get_categories();
 
 is(scalar @$items, 5);
 is(scalar @$categories, 3);
+
+# add existing item
+$basket->add_item({
+    text     => q{a},
+    category => q{electronics}
+});
+
+my $items = $basket->get_items();
+my $categories = $basket->get_categories();
+
+is(scalar @$items, 5);
+is(scalar @$categories, 3);
+my $result = $basket->list({ categories => ["electronics"] });
+my $now = DateTime->now();
+
+# increase quantity and change date to the date of addition
+ok(grep { $_ eq q{2x a;} . $now->ymd() } @{ $result->{electronics} });
 
 # missing text
 

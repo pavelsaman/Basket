@@ -20,5 +20,5 @@ no_index:
 requires:
   Class::Std: '0.013'
   Readonly: '2.05'
-version: 0.002
+version: 0.004
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

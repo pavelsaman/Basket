@@ -58,7 +58,8 @@ Options:
                      when used with --list and --delete without --item.
     -i|--item       Specifies an item, has to be used with --add and
                      with --delete when no --category is specified. Could be 
-                     used with --delete when --category is specified.
+                     used (even mroe times) with --delete when --category
+                     is specified.
     --before        Filters only items added before a certain date. Could 
                      be used with --list.
     --after         Filters only items added after a certain date. Could 
@@ -135,6 +136,24 @@ To delete more categories (and all items in them):
 ```
 $ basket -d -c electronics -c kitchen
 ```
+
+You can add more same items, if you print out your shopping list then, 
+it will show up in the output like so:
+
+```
+$ basket -l
+electronics:
+ 2x RJ-45 cable
+```
+
+The quantity shows up only if you have more items on your shopping list.
+If you delete such an item:
+
+```
+$ basket -d -c electronics -i "RJ-45 cable"
+```
+
+it will wipe it out completely, _NOT_ descrease the quantity.
 
 ## More information
 

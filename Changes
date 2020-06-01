@@ -1,5 +1,17 @@
 Revision history of basket app
 
+0.004  2020-06-01 20:00:00  CZE/Prague
+
+    - support quantity concept + tests for it
+    - move version number to bin/basket file
+    - update documentation
+
+0.003  2020-06-01 19:00:00  CZE/Prague
+
+    - allow deletion of more items in one category,
+      e.g $basket -d -c abc -i a -i b -i c => it's
+      a valid command now
+
 0.002  2020-05-31 12:00:00  CZE/Prague
 
     - initial stable version with all documentation,

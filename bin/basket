@@ -7,9 +7,9 @@ use Readonly;
 use Pod::Usage;
 use Getopt::Long;
 use List::MoreUtils qw(uniq);
-use Basket 0.002;
+use Basket 0.003;
 
-our $VERSION = 0.003;
+our $VERSION = 0.004;
 
 sub print_usage {
     my $usage_line = <<'END_USAGE';
@@ -64,7 +64,7 @@ END_HELP_MSG_END
 }
 
 sub print_version {
-    printf "%s: %.3f\n", qq{basket version:}, qq{$Basket::VERSION};
+    printf "%s: %.3f\n", qq{basket version:}, qq{$VERSION};
 
     return;
 }
@@ -205,7 +205,7 @@ Basket - keep track of your shopping lists
 
 =head1 VERSION
 
-This document describes version 0.003
+This document describes version 0.004
 
 =head1 SYNOPSIS
 
@@ -308,6 +308,22 @@ To delete one category (and therefore all items from it):
 To delete more categories (and all items in them):
 
     $ basket -d -c electronics -c kitchen
+
+You can add more same items, if you print out your shopping list then, 
+it will show up in the output like so:
+
+    $ basket -l
+
+        electronics:
+
+         2x RJ-45 cable
+
+The quantity shows up only if you have more items on your shopping list.
+If you delete such an item:
+
+    $ basket -d -c electronics -i "RJ-45 cable"
+
+it will wipe it out completely, I<NOT> descrease the quantity.
 
 =head1 BUGS AND LIMITATIONS
 

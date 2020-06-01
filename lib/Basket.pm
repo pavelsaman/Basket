@@ -7,10 +7,10 @@ use DateTime;
 use Class::Std;
 use Carp qw(croak);
 use List::MoreUtils qw(duplicates any);
-use Item 0.001;
+use Item 0.002;
 use Category 0.001;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 {
     sub SAVED     :PRIVATE { 1 };
@@ -68,16 +68,19 @@ our $VERSION = 0.002;
         while (my $line = <$basket_file>) {
             chomp $line;            
             my @parts = split /;/, $line;
-            $parts[0] =~ s{["]}{}gxms;
-            $parts[1] =~ s{\s+}{}gxms;
+            $parts[0] =~ s{\s+}{}gxms;
+            $parts[1] =~ s{["]}{}gxms;
+            $parts[2] =~ s{\s+}{}gxms;
 
             next LINE if $parts[0] eq q{};
             next LINE if $parts[1] eq q{};
+            next LINE if $parts[2] eq q{};
 
             my $item = Item->new({
-                text => $parts[0],
-                added => $parts[1]
-            });
+                text     => $parts[1],
+                added    => $parts[2],
+                quantity => $parts[0]
+            });            
 
             $items->{$item->get_text()} = $item;            
         }
@@ -141,24 +144,39 @@ our $VERSION = 0.002;
 
         if (not defined $args_ref->{text}) {
             croak __PACKAGE__ . "::add_item(): no item text";
-        }
+        }        
 
-        my $now = DateTime->now();
-
-        my $new_item = Item->new({ 
-            text  => $args_ref->{text},
-            added => $now->ymd()
-        });
-
+        # create new category
         if (not defined $basket{ident $self}->{$args_ref->{category}}) {
             my $new_cat = Category->new({ name => $args_ref->{category} });
             $basket{ident $self}->{$args_ref->{category}}->{obj} = $new_cat;
-        }
+        }        
 
-        $basket{ident $self}->{
-            $args_ref->{category}}->{items}->{$new_item->get_text()}
-                = $new_item
-        ;
+        my $existing_item
+            = $basket{ident $self}->{
+                $args_ref->{category}}->{items}->{$args_ref->{text}}
+        ;              
+
+        my $now = DateTime->now();
+
+        # increase quantity of an existing item
+        if ($existing_item) {
+            $existing_item->increase_quantity();
+            $existing_item->set_added_on($now->ymd());            
+        }
+        # new item
+        else {
+            my $new_item = Item->new({ 
+                text     => $args_ref->{text},
+                added    => $now->ymd(),
+                quantity => 1
+            });
+
+            $basket{ident $self}->{
+                $args_ref->{category}}->{items}->{$new_item->get_text()}
+                    = $new_item
+            ;
+        }        
 
         $saved{ident $self} = NOT_SAVED;
         return;
@@ -213,6 +231,21 @@ our $VERSION = 0.002;
         return;
     }
 
+    sub _build_item_text {
+        my $item_ref         = shift;
+        my $pretty_item_text = q{};
+
+        if ($item_ref->get_quantity() > 1) {
+            $pretty_item_text = $item_ref->get_quantity() . "x ";
+        }
+        
+        $pretty_item_text .= join q{;}, $item_ref->get_text(),
+            $item_ref->get_added_on()
+        ;
+
+        return $pretty_item_text;
+    }
+
     sub list {
         my $self     = shift;
         my $args_ref = shift; 
@@ -232,26 +265,17 @@ our $VERSION = 0.002;
                 
                 if (defined $args_ref->{after}) {
                     if ($it->is_newer_than($args_ref->{after})) {                        
-                        push @{ $result->{$cat} }, join q{;},
-                            $it->get_text(), 
-                            $it->get_added_on()
-                        ; 
+                        push @{ $result->{$cat} }, _build_item_text($it);                        
                     }                                 
                 }                
                 if (defined $args_ref->{before}) {
                     if ($it->is_older_than($args_ref->{before})) {                        
-                        push @{ $result->{$cat} }, join q{;},
-                            $it->get_text(), 
-                            $it->get_added_on()
-                        ;    
+                        push @{ $result->{$cat} }, _build_item_text($it);                        
                     }                                  
                 }
                 if (not defined $args_ref->{before}
                     and not defined $args_ref->{after}) {
-                    push @{ $result->{$cat} }, join q{;},
-                        $it->get_text(), 
-                        $it->get_added_on()
-                    ;
+                    push @{ $result->{$cat} }, _build_item_text($it);                    
                 }
             }            
 
@@ -307,7 +331,10 @@ our $VERSION = 0.002;
 
             # save all items
             foreach my $item (keys %{ $basket{ident $self}->{$cat}->{items} }) {
-                printf $cat_file "\"%s\";%s\n", $item
+                printf $cat_file "%s;\"%s\";%s\n",
+                    $basket{ident $self}->{$cat}->{items}->{$item}
+                        ->get_quantity(),
+                    $item
                     , $basket{ident $self}->{$cat}->{items}
                         ->{$item}->get_added_on();
             }
