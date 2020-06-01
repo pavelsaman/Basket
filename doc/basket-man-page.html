@@ -30,7 +30,7 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>This document describes version 0.002</p>
+<p>This document describes version 0.003</p>
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
@@ -51,7 +51,8 @@
                          when used with --list and --delete without --item.
         -i|--item       Specifies an item, has to be used with --add and
                          with --delete when no --category is specified. Could be 
-                         used with --delete when --category is specified.
+                         used (even mroe times) with --delete when --category
+                         is specified.
         --before        Filters only items added before a certain date. Could 
                          be used with --list.
         --after         Filters only items added after a certain date. Could 
@@ -111,6 +112,10 @@
 <p>To delete more items from all categories:</p>
 
 <pre><code>    $ bsket -d -i keyboard -i &quot;cisco router&quot;</code></pre>
+
+<p>To delete more items from one category:</p>
+
+<pre><code>    $ bsket -d -c electronics -i keyboard -i &quot;cisco router&quot;</code></pre>
 
 <p>To delete one category (and therefore all items from it):</p>
 

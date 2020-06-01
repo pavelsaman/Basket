@@ -9,6 +9,8 @@ use Getopt::Long;
 use List::MoreUtils qw(uniq);
 use Basket 0.002;
 
+our $VERSION = 0.003;
+
 sub print_usage {
     my $usage_line = <<'END_USAGE';
 Usage: basket [-l [-c category --before date --after date --dates]
@@ -39,7 +41,8 @@ Options:
                      when used with --list and --delete without --item.
     -i|--item       Specifies an item, has to be used with --add and
                      with --delete when no --category is specified. Could be 
-                     used with --delete when --category is specified.
+                     used (even mroe times) with --delete when --category
+                     is specified.
     --before        Filters only items added before a certain date. Could 
                      be used with --list.
     --after         Filters only items added after a certain date. Could 
@@ -202,7 +205,7 @@ Basket - keep track of your shopping lists
 
 =head1 VERSION
 
-This document describes version 0.002
+This document describes version 0.003
 
 =head1 SYNOPSIS
 
@@ -223,7 +226,8 @@ This document describes version 0.002
                          when used with --list and --delete without --item.
         -i|--item       Specifies an item, has to be used with --add and
                          with --delete when no --category is specified. Could be 
-                         used with --delete when --category is specified.
+                         used (even mroe times) with --delete when --category
+                         is specified.
         --before        Filters only items added before a certain date. Could 
                          be used with --list.
         --after         Filters only items added after a certain date. Could 
@@ -292,6 +296,10 @@ To delete one item from one category:
 To delete more items from all categories:
 
     $ bsket -d -i keyboard -i "cisco router"
+
+To delete more items from one category:
+
+    $ bsket -d -c electronics -i keyboard -i "cisco router"
 
 To delete one category (and therefore all items from it):
 

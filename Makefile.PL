@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME         => 'Basket',
     ABSTRACT     => 'Basket - keep track of your shopping lists',
-    VERSION_FROM => 'lib/Basket.pm',
+    VERSION_FROM => 'lib/basket',
     PREREQ_PM    => {                      
                       'Class::Std'     => 0.013,
                       'Readonly'       => 2.05
