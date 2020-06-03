@@ -8,9 +8,9 @@ use Class::Std;
 use Carp qw(croak);
 use List::MoreUtils qw(duplicates any);
 use Item 0.002;
-use Category 0.001;
+use Category 0.002;
 
-our $VERSION = 0.004;
+our $VERSION = 0.005;
 
 {
     sub SAVED     :PRIVATE { 1 };
@@ -293,6 +293,21 @@ our $VERSION = 0.004;
         }              
 
         return $result;
+    }
+
+    sub rename_category {
+        my $self     = shift;
+        my $args_ref = shift;
+
+        $basket{ident $self}->{
+            $args_ref->{old}}->{obj}->set_name($args_ref->{new})
+        ;
+        $basket{ident $self}->{
+            $args_ref->{new}} = delete $basket{ident $self}->{
+                $args_ref->{old}}
+        ;
+
+        return;
     }
 
     sub _prune_empty_categories {

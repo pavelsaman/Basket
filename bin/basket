@@ -6,16 +6,17 @@ use warnings;
 use Readonly;
 use Pod::Usage;
 use Getopt::Long;
-use List::MoreUtils qw(uniq);
-use Basket 0.003;
+use List::MoreUtils qw(uniq any);
+use Basket 0.005;
 
-our $VERSION = 0.005;
+our $VERSION = 0.006;
 
 sub print_usage {
     my $usage_line = <<'END_USAGE';
 Usage: basket [-l [-c category --before date --after date --dates]
                | -a -c category -i item
-               | -d <-c category [ -i item ] | -i item>]
+               | -d <-c category [ -i item ] | -i item>
+               | --rename old:new ]
 END_USAGE
 
     printf "%s", $usage_line;
@@ -35,6 +36,8 @@ Options:
     -d|--delete     Deletes either the whole category (and therefore
                      all its items) or one item within a specified
                      category.
+    --rename        Renames a category, argument is given in the following
+                     format: old_category_name:new_category_name
 
     -c|--category   Specifies a category name, could be used with --list,
                      has to be used with --add and --delete. Could be repeated
@@ -110,11 +113,12 @@ my $result = GetOptions(
     'c|cat|category=s{1,}' => \ my @categories,
     'after=s'              => \ my $after,
     'before=s'             => \ my $before,
-    'dates'                => \ my $with_dates
+    'dates'                => \ my $with_dates,
+    'rename=s'             => \ my $rename_category 
 );
 
 # exactly one of --list, --delete, --add has to be given on the command line
-my @given_verbs = grep { $_ } ($list, $add, $delete);
+my @given_verbs = grep { $_ } ($list, $add, $delete, $rename_category);
 
 if (scalar @given_verbs != 1) {
     print_usage();
@@ -166,6 +170,25 @@ elsif ($add) {
         $basket->add_item({ category => $categories[0], text => $item });
     }
 }
+elsif ($rename_category) {
+    # parse it first old_cat:new_cat
+    my ($old, $new) = split /:/, $rename_category;
+    
+    # new has to be given
+    if (not $new) {
+        print_usage();
+        exit 1;
+    }
+
+    # old has to exist
+    my $category_names_ref = $basket->get_category_names();
+    if (not any { $_ eq $old } @$category_names_ref) {
+        print_usage();
+        exit 1;
+    }
+
+    $basket->rename_category({ old => $old, new => $new });
+}
 else {
     # either item(s) or category(ies) has to be specified
     if ((scalar @items > 1 and scalar @categories > 1)
@@ -205,13 +228,14 @@ Basket - keep track of your shopping lists
 
 =head1 VERSION
 
-This document describes version 0.005
+This document describes version 0.006
 
 =head1 SYNOPSIS
 
     Usage: basket [-l [-c category --before date --after date --dates]
-                   | -a -c category -i item
-                   | -d <-c category [ -i item ] | -i item>]
+               | -a -c category -i item
+               | -d <-c category [ -i item ] | -i item>
+               | --rename old:new ]
 
     Options:
         -l|--list       Lists all items, could be combined with:
@@ -220,6 +244,8 @@ This document describes version 0.005
         -d|--delete     Deletes either the whole category (and therefore
                          all its items) or one item within a specified
                          category.
+        --rename        Renames a category, argument is given in the following
+                         format: old_category_name:new_category_name
 
         -c|--category   Specifies a category name, could be used with --list,
                          has to be used with --add and --delete. Could be repeated
@@ -238,7 +264,7 @@ This document describes version 0.005
         --usage         Prints the usage line.
         --help          Prints this message.
         --man           Prints the whole man page.
-        --version       Prints the current version.
+        --version       Prints the current version. 
 
 =head1 DESCRIPTION
 

@@ -5,7 +5,7 @@ use warnings;
 use Class::Std;
 use Hash::Util qw(hash_value);
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 {
     my %name :ATTR( :get<name> );
@@ -16,7 +16,16 @@ our $VERSION = 0.001;
         $name{$ident} = $args_ref->{name};                  
 
         return;
-    }        
+    }      
+
+    sub set_name {
+        my $self     = shift;
+        my $new_name = shift;
+
+        $name{ident $self} = $new_name;
+        
+        return;
+    }  
 }
 
 1;

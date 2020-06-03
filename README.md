@@ -15,6 +15,7 @@ perform with your shopping lists:
 --list
 --add
 --delete
+--rename
 ```
 
 This application requires you set up an environment variable **BASKET_DIR** with 
@@ -39,7 +40,8 @@ Use `bin/basket` as the frontend for this app, so it's useful to copy this scrip
 ```
 Usage: basket [-l [-c category --before date --after date --dates]
                | -a -c category -i item
-               | -d <-c category [ -i item ] | -i item>]
+               | -d <-c category [ -i item ] | -i item>
+               | --rename old:new ]
 ```
 
 ## Options
@@ -52,6 +54,8 @@ Options:
     -d|--delete     Deletes either the whole category (and therefore
                      all its items) or one item within a specified
                      category.
+    --rename        Renames a category, argument is given in the following
+                     format: old_category_name:new_category_name
 
     -c|--category   Specifies a category name, could be used with --list,
                      has to be used with --add and --delete. Could be repeated

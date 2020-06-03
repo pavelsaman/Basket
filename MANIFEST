@@ -17,4 +17,5 @@ t/dummy_files/kitchen
 t/Item.t
 t/list_Basket.t
 t/quantity_Basket.t
+t/rename_Category.t
 t/save_Basket.t

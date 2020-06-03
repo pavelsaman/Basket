@@ -30,13 +30,14 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>This document describes version 0.005</p>
+<p>This document describes version 0.006</p>
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
 <pre><code>    Usage: basket [-l [-c category --before date --after date --dates]
-                   | -a -c category -i item
-                   | -d &lt;-c category [ -i item ] | -i item&gt;]
+               | -a -c category -i item
+               | -d &lt;-c category [ -i item ] | -i item&gt;
+               | --rename old:new ]
 
     Options:
         -l|--list       Lists all items, could be combined with:
@@ -45,6 +46,8 @@
         -d|--delete     Deletes either the whole category (and therefore
                          all its items) or one item within a specified
                          category.
+        --rename        Renames a category, argument is given in the following
+                         format: old_category_name:new_category_name
 
         -c|--category   Specifies a category name, could be used with --list,
                          has to be used with --add and --delete. Could be repeated
@@ -63,7 +66,7 @@
         --usage         Prints the usage line.
         --help          Prints this message.
         --man           Prints the whole man page.
-        --version       Prints the current version.</code></pre>
+        --version       Prints the current version. </code></pre>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 

@@ -1,5 +1,4 @@
 use Test::More qw(no_plan);
-use List::MoreUtils qw(any);
 
 use Basket;
 
