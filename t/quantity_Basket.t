@@ -6,56 +6,66 @@ use Basket;
 
 ###############################################################################
 
-my $basket = Basket->new({ dir => q{./t/dummy_files} });
+subtest 'List Quantity Of 1' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
 
-isa_ok($basket, q{Basket});
+    my $result = $basket->list({ categories => ["electronics"] });
 
-###############################################################################
-# quantity 1
+    ok(grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
+    ok(grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
+};
 
-my $result = $basket->list({ categories => ["electronics"] });
+subtest 'List Quantity Of 2' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    $basket->add_item({
+        text     => q{a},
+        category => q{electronics}
+    });
 
-ok(grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
-ok(grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
+    my $result = $basket->list({ categories => ["electronics"] });
 
-###############################################################################
-# quantity 1
+    my $now = DateTime->now();    
+    ok(grep { $_ eq q{2x a;} . $now->ymd() } @{ $result->{electronics} });
+    ok(grep { $_ eq q{b;2020-02-01}        } @{ $result->{electronics} });
+};
 
-# add more of "a"
-$basket->add_item({
-    text     => q{a},
-    category => q{electronics}
-});
-my $now = DateTime->now();
+subtest 'List Quantity Of 3' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    $basket->add_item({
+        text     => q{a},
+        category => q{electronics}
+    });
+    $basket->add_item({
+        text     => q{a},
+        category => q{electronics}
+    });
 
-my $result = $basket->list({ categories => ["electronics"] });
-ok(grep { $_ eq q{2x a;} . $now->ymd() } @{ $result->{electronics} });
-ok(grep { $_ eq q{b;2020-02-01}        } @{ $result->{electronics} });
+    my $result = $basket->list({ categories => ["electronics"] });
 
-###############################################################################
-# quantity 3
+    my $now = DateTime->now();    
+    ok(grep { $_ eq q{3x a;} . $now->ymd() } @{ $result->{electronics} });
+    ok(grep { $_ eq q{b;2020-02-01}        } @{ $result->{electronics} });
+};
 
-# add more of "a"
-$basket->add_item({
-    text     => q{a},
-    category => q{electronics}
-});
-my $now = DateTime->now();
+subtest 'Add Item, Delete Item - No Quantity, No Item' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    $basket->add_item({
+        text     => q{a},
+        category => q{electronics}
+    });
+    $basket->add_item({
+        text     => q{a},
+        category => q{electronics}
+    });
+    $basket->delete_item({
+        text     => q{a},
+        category => q{electronics}
+    });
 
-my $result = $basket->list({ categories => ["electronics"] });
-ok(grep { $_ eq q{3x a;} . $now->ymd() } @{ $result->{electronics} });
-ok(grep { $_ eq q{b;2020-02-01}        } @{ $result->{electronics} });
+    my $result = $basket->list({ categories => ["electronics"] });
 
-###############################################################################
-# quantity 0
-
-# delete "a"
-$basket->delete_item({
-    text     => q{a},
-    category => q{electronics}
-});
-
-my $result = $basket->list({ categories => ["electronics"] });
-ok(not grep { $_ eq q{3x a;} . $now->ymd() } @{ $result->{electronics} });
-ok(not grep { $_ eq q{a;2020-01-01}        } @{ $result->{electronics} });
-ok(grep { $_ eq q{b;2020-02-01}            } @{ $result->{electronics} });
+    my $now = DateTime->now(); 
+    ok(not grep { $_ eq q{3x a;} . $now->ymd() } @{ $result->{electronics} });
+    ok(not grep { $_ eq q{a;2020-01-01}        } @{ $result->{electronics} });
+    ok(    grep { $_ eq q{b;2020-02-01}        } @{ $result->{electronics} });
+};

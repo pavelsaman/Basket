@@ -19,7 +19,6 @@ subtest 'Get Category Names' => sub {
     is(scalar @kitchen, 1);
 };
 
-
 subtest 'Create Basket When No Dir Is Passed' => sub {
     my $basket = eval{ Basket->new({ }) };
     my $error = $@;
@@ -28,7 +27,6 @@ subtest 'Create Basket When No Dir Is Passed' => sub {
     like($error, qr/no dir/);
 };
 
-
 subtest 'Create Basket When Wrong Directory Is Passed' => sub {
     my $basket = eval{ Basket->new({ dir => q{./t/dummy_file} }) };
     my $error = $@;
@@ -36,7 +34,6 @@ subtest 'Create Basket When Wrong Directory Is Passed' => sub {
     is($basket, undef);
     like($error, qr/It is not possible to read from dir in BASKET_DIR/);
 };
-
 
 subtest 'Get Correct Number Of Categories' => sub {
     my $basket = Basket->new({ dir => q{./t/dummy_files} });
