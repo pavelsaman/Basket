@@ -5,121 +5,123 @@ use Basket;
 
 ###############################################################################
 
-my $method = 'list';
+subtest 'List Everything' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
 
-###############################################################################
+    my $result = $basket->list({ categories => [] });
 
-my $basket = Basket->new({ dir => q{./t/dummy_files} });
-isa_ok($basket, q{Basket});
+    ok(grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
+    ok(grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
+    ok(grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
+    ok(grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+};
 
-###############################################################################
-# --list
+subtest 'Use --after Option' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
 
-my $result = $basket->list({ categories => [] });
+    my $result = $basket->list({ categories => [], after => "2020-01-01" });
 
-ok(grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
-ok(grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
-ok(grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
-ok(grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+    ok(not grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
+    ok(    grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
+    ok(    grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
+    ok(    grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+};
 
-###############################################################################
-# --list --after
+subtest 'Use --before Option' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
 
-my $result = $basket->list({ categories => [], after => "2020-01-01" });
+    my $result = $basket->list({ categories => [], before => "2020-02-02" });
 
-ok(not grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
-ok(    grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
-ok(    grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
-ok(    grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+    ok(    grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
+    ok(    grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
+    ok(not grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
+    ok(not grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+};
 
-###############################################################################
-# --list --before
+subtest 'Use --before and --after Option' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
 
-my $result = $basket->list({ categories => [], before => "2020-02-02" });
+    my $result = $basket->list({
+        categories => [],
+        after      => "2020-01-01",
+        before     => "2020-04-01"
+    });
 
-ok(    grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
-ok(    grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
-ok(not grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
-ok(not grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+    ok(not grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
+    ok(    grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
+    ok(    grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
+    ok(not grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+};
 
-###############################################################################
-# --list --after --category
+subtest 'Use --after and --category Option' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
 
-my $result = $basket->list({
-    categories => ["kitchen"],
-    after => "2020-01-01"
-});
+    my $result = $basket->list({
+        categories => ["kitchen"],
+        after => "2020-01-01"
+    });
 
-ok(not grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
-ok(not grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
-ok(    grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
-ok(    grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+    ok(not grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
+    ok(not grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
+    ok(    grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
+    ok(    grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+};
 
-###############################################################################
-# --list --before --category
+subtest 'Use --before and --category Option' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
 
-my $result = $basket->list({
-    categories => ["kitchen"],
-    before => "2020-03-02"
-});
+    my $result = $basket->list({
+        categories => ["kitchen"],
+        before => "2020-03-02"
+    });
 
-ok(not grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
-ok(not grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
-ok(    grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
-ok(not grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+    ok(not grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
+    ok(not grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
+    ok(    grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
+    ok(not grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+};
 
-###############################################################################
-# --list --after --before
+subtest 'Use --before, --after, and --category Option' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
 
-my $result = $basket->list({
-    categories => [],
-    after      => "2020-01-01",
-    before     => "2020-04-01"
-});
+    my $result = $basket->list({
+        categories => ["electronics"],
+        after      => "2020-01-01",
+        before     => "2020-04-01"
+    });
 
-ok(not grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
-ok(    grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
-ok(    grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
-ok(not grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+    ok(not grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
+    ok(    grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
+    ok(not grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
+    ok(not grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+};
 
-###############################################################################
-# --list --after --before --category
+subtest 'Use --before, --after, and --category Option - Two Categories' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
 
-my $result = $basket->list({
-    categories => ["electronics"],
-    after      => "2020-01-01",
-    before     => "2020-04-01"
-});
+    my $result = $basket->list({
+        categories => ["electronics", "kitchen"],
+        after      => "2020-01-01",
+        before     => "2020-04-01"
+    });
 
-ok(not grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
-ok(    grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
-ok(not grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
-ok(not grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+    ok(not grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
+    ok(    grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
+    ok(    grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
+    ok(not grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+};
 
-###############################################################################
-# --list --after --before --category
+subtest 'Use --before, --after, and --category Option - No Results' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
 
-my $result = $basket->list({
-    categories => ["electronics", "kitchen"],
-    after      => "2020-01-01",
-    before     => "2020-04-01"
-});
+    my $result = $basket->list({
+        categories => ["electronics", "kitchen"],
+        after      => "2020-02-01",
+        before     => "2020-03-01"
+    });
 
-ok(not grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
-ok(    grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
-ok(    grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
-ok(not grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
-
-###############################################################################
-# --list --after --before --category
-
-my $result = $basket->list({
-    categories => ["electronics", "kitchen"],
-    after      => "2020-02-01",
-    before     => "2020-03-01"
-});
-
-ok(not grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
-ok(not grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
-ok(not grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
-ok(not grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+    ok(not grep { $_ eq q{a;2020-01-01} } @{ $result->{electronics} });
+    ok(not grep { $_ eq q{b;2020-02-01} } @{ $result->{electronics} });
+    ok(not grep { $_ eq q{c;2020-03-01} } @{ $result->{kitchen}     });
+    ok(not grep { $_ eq q{d;2020-04-01} } @{ $result->{kitchen}     });
+};

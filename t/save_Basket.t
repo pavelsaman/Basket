@@ -4,62 +4,134 @@ use Basket;
 
 ###############################################################################
 
-my $basket = Basket->new({ dir => q{./t/dummy_files} });
+subtest 'Save New Item' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $items = $basket->get_items();
+    my $categories = $basket->get_categories();
+    is(scalar @$items, 4);
+    is(scalar @$categories, 2);
 
-isa_ok($basket, q{Basket});
+    # save new item
+    $basket->add_item({
+        text     => q{raspberry},
+        category => q{electronics}
+    });    
+    # save changes
+    $basket->save();
 
-my $items = $basket->get_items();
-my $categories = $basket->get_categories();
+    # check it's been saved
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
 
-is(scalar @$items, 4);
-is(scalar @$categories, 2);
+    my $items = $basket->get_items();
+    my $categories = $basket->get_categories();
+    is(scalar @$items, 5);
+    is(scalar @$categories, 2);
 
-# save new item
-$basket->add_item({
-    text     => q{raspberry},
-    category => q{electronics}
-});
+    # clean
+    $basket->delete_item({
+        text     => q{raspberry},
+        category => q{electronics}
+    });
+    $basket->save();
+};
 
-# add new category
-$basket->add_item({
-    text     => q{bike},
-    category => q{garage}
-});
+subtest 'Save New Item With New Category' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $items = $basket->get_items();
+    my $categories = $basket->get_categories();
+    is(scalar @$items, 4);
+    is(scalar @$categories, 2);
+    
+    # add new category
+    $basket->add_item({
+        text     => q{bike},
+        category => q{garage}
+    });
+    # save changes
+    $basket->save();
 
-# save changes
-$basket->save();
+    # check it's been saved
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
 
-# check it's been saved
-my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $items = $basket->get_items();
+    my $categories = $basket->get_categories();
+    is(scalar @$items, 5);
+    is(scalar @$categories, 3);
 
-isa_ok($basket, q{Basket});
+    # clean
+    $basket->delete_item({
+        text     => q{bike},
+        category => q{garage}
+    });
+    $basket->save();
+};
 
-my $items = $basket->get_items();
-my $categories = $basket->get_categories();
+subtest 'Delete Item' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $items = $basket->get_items();
+    my $categories = $basket->get_categories();
+    is(scalar @$items, 4);
+    is(scalar @$categories, 2);    
+    # add new category
+    $basket->add_item({
+        text     => q{bike},
+        category => q{kitchen}
+    });
+    # save changes
+    $basket->save();
+    # check it's been saved
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $items = $basket->get_items();
+    my $categories = $basket->get_categories();
+    is(scalar @$items, 5);
+    is(scalar @$categories, 2);
 
-is(scalar @$items, 6);
-is(scalar @$categories, 3);
+    # delete the item
+    $basket->delete_item({
+        text     => q{bike},
+        category => q{kitchen}
+    });
+    $basket->save();
 
-# delete
-$basket->delete_item({
-    text     => q{bike},
-    category => q{garage}
-});
+    # check it's been deleted
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $items = $basket->get_items();
+    my $categories = $basket->get_categories();
+    is(scalar @$items, 4);
+    is(scalar @$categories, 2);
+};
 
-$basket->delete_item({
-    text     => q{raspberry}
-});
+subtest 'Delete Last Item - Category Gets Deletes As Well' => sub {
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $items = $basket->get_items();
+    my $categories = $basket->get_categories();
+    is(scalar @$items, 4);
+    is(scalar @$categories, 2);    
+    # add new category
+    $basket->add_item({
+        text     => q{bike},
+        category => q{garage}
+    });
+    # save changes
+    $basket->save();
+    # check it's been saved
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $items = $basket->get_items();
+    my $categories = $basket->get_categories();
+    is(scalar @$items, 5);
+    is(scalar @$categories, 3);
 
-# save changes
-$basket->save();
+    # delete the item
+    $basket->delete_item({
+        text     => q{bike},
+        category => q{garage}
+    });
+    $basket->save();
 
-# check it's been saved
-my $basket = Basket->new({ dir => q{./t/dummy_files} });
-
-isa_ok($basket, q{Basket});
-
-my $items = $basket->get_items();
-my $categories = $basket->get_categories();
-
-is(scalar @$items, 4);
-is(scalar @$categories, 2);
+    # check it's been deleted
+    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $items = $basket->get_items();
+    my $categories = $basket->get_categories();
+    is(scalar @$items, 4);
+    is(scalar @$categories, 2);
+};
