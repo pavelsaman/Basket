@@ -174,12 +174,12 @@ Note that for sending emails, the following environment variables
 have to be set:
 
 ```
-BASKET_SENDER    
-BASKET_PWD
+BASKET_SENDER        
 BASKET_SERVER
 BASKET_PORT    
+BASKET_SECURITY=[ssl | starttls | 0]
 BASKET_USER
-BASKET_SECURITY
+BASKET_PWD
 ```
 
 Option `--send` could be used with any option that also goes with `--list`.
