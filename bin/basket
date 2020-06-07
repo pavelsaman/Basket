@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use lib './lib';
+
 use Readonly;
 use Pod::Usage;
 use Getopt::Long;
