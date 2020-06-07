@@ -13,6 +13,9 @@ use Category 0.002;
 our $VERSION = 0.005;
 
 {
+    Readonly my $delimeter       => q{;};
+    Readonly my $backup_file_ext => q{.bak};
+
     sub SAVED     :PRIVATE { 1 };
     sub NOT_SAVED :PRIVATE { 0 };
     sub EMPTY     :PRIVATE { 0 };
@@ -69,8 +72,9 @@ our $VERSION = 0.005;
         my $items = {};
         LINE:
         while (my $line = <$basket_file>) {
-            chomp $line;            
-            my @parts = split /;/, $line;
+            chomp $line;  
+
+            my @parts = split /$delimeter/, $line;
             $parts[0] =~ s{\s+}{}gxms;
             $parts[1] =~ s{["]}{}gxms;
             $parts[2] =~ s{\s+}{}gxms;
@@ -229,8 +233,8 @@ our $VERSION = 0.005;
         }
 
         delete $basket{ident $self}->{$args_ref->{category}};
-
         $saved{ident $self} = NOT_SAVED;
+
         return;
     }
 
@@ -242,7 +246,7 @@ our $VERSION = 0.005;
             $pretty_item_text = $item_ref->get_quantity() . "x ";
         }
         
-        $pretty_item_text .= join q{;}, $item_ref->get_text(),
+        $pretty_item_text .= join $delimeter, $item_ref->get_text(),
             $item_ref->get_added_on()
         ;
 
@@ -332,7 +336,7 @@ our $VERSION = 0.005;
             next BASKET_FILE if -d $cat_file;                   
             
             rename $dir{ident $self} . q{/} . $cat_file,
-                   $dir{ident $self} . q{/} . $cat_file . q{.bak};   
+                   $dir{ident $self} . q{/} . $cat_file . $backup_file_ext;   
         }        
 
         closedir $basket_dir;
@@ -366,24 +370,19 @@ our $VERSION = 0.005;
     sub _delete_backup_files :PRIVATE {
         my $self = shift;
 
-        unlink glob $dir{ident $self} . q{/} . q{*.bak};
+        unlink glob join q{}, $dir{ident $self}, q{/}, q{*}, $backup_file_ext;
 
         return;
     }
 
     sub save {
         my $self = shift;
-
-        # create backup files == rename current ones
-        $self->_raname_files();
-
-        # create new files
-        $self->_dump();
-
-        # delete backup files
+        
+        $self->_raname_files();        
+        $self->_dump();       
         $self->_delete_backup_files();
 
-        $saved{ident $self} = SAVED;
+        $saved{ident $self} = SAVED;        
         return;
     }
 }

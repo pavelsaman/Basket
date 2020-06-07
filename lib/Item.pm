@@ -13,6 +13,7 @@ our $VERSION = 0.002;
     Readonly my $year_part  => 0;
     Readonly my $month_part => 1;
     Readonly my $day_part   => 2;
+    Readonly my $delimeter  => q{-};
 
     sub TRUE  :PRIVATE { 1 };   
     sub FALSE :PRIVATE { 0 };   
@@ -28,6 +29,7 @@ our $VERSION = 0.002;
         $text{$ident}       = $args_ref->{text};
         $added{$ident}      = $args_ref->{added};
         $quantity{$ident}   = $args_ref->{quantity};
+
         $hash_value{$ident} = hash_value(
             join q{}, $text{$ident}, $added{$ident}, $quantity{$ident}
         );
@@ -39,7 +41,7 @@ our $VERSION = 0.002;
         my $self = shift;
         my $part = shift;
 
-        return (split /-/, $added{ident $self})[$part];
+        return (split /$delimeter/, $added{ident $self})[$part];
     }
 
     sub increase_quantity {
@@ -76,10 +78,7 @@ our $VERSION = 0.002;
     }
 
     sub _get_datetime_obj {        
-        my @date = split /-/, shift;
-
-        #$date[1] =~ s{^0}{}xms;
-        #$date[2] =~ s{^0}{}xms;
+        my @date = split /$delimeter/, shift;        
 
         return DateTime->new(
             year  => $date[0],
