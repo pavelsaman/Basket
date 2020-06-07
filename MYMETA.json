@@ -33,11 +33,13 @@
       "runtime" : {
          "requires" : {
             "Class::Std" : "0.013",
+            "Email::Sender" : "1.300034",
+            "Email::Simple" : "2.216",
             "Readonly" : "2.05"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 0.006,
+   "version" : 0.007,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

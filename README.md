@@ -38,7 +38,7 @@ Use `bin/basket` as the frontend for this app, so it's useful to copy this scrip
 ## Usage
 
 ```
-Usage: basket [-l [-c category --before date --after date --dates]
+Usage: basket [-l [-c category --before date --after date --dates --send email]
                | -a -c category -i item
                | -d <-c category [ -i item ] | -i item>
                | --rename old:new ]
@@ -70,6 +70,9 @@ Options:
                      be used with --list.
     --dates         Prints when items were added along with their names. Could 
                      be used with --list.
+    --send          Sends a pretty printed shopping list to a given email
+                     addr. If the result (e.g. after applying filters) is
+                     an empty shopping list, the email won't be sent.
 
     --usage         Prints the usage line.
     --help          Prints this message.
@@ -158,6 +161,28 @@ $ basket -d -c electronics -i "RJ-45 cable"
 ```
 
 it will wipe it out completely, _NOT_ descrease the quantity.
+
+To send a shopping list(s) to an email address:
+
+```
+$ basket -l --send samanpavel@gmail.com
+$ basket -l -c grocery --send shopping_list@pickitup.com
+$ basket -l -c grocery -c kitchen --send shopping_list@pickitup.com
+```
+
+Note that for sending emails, the following environment variables
+have to be set:
+
+```
+BASKET_SENDER    
+BASKET_PWD
+BASKET_SERVER
+BASKET_PORT    
+BASKET_USER
+BASKET_SECURITY
+```
+
+Option `--send` could be used with any option that also goes with `--list`.
 
 ## More information
 

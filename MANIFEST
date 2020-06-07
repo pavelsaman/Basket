@@ -3,6 +3,7 @@ Changes
 doc/basket-man-page.html
 lib/Basket.pm
 lib/Category.pm
+lib/Email.pm
 lib/Item.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -14,6 +15,7 @@ t/Basket.t
 t/Category.t
 t/dummy_files/electronics
 t/dummy_files/kitchen
+t/Email.t
 t/Item.t
 t/list_Basket.t
 t/quantity_Basket.t

@@ -1,5 +1,9 @@
 Revision history of basket app
 
+0.007  2020-06-07 19:00:00  CZE/Prague
+
+    - sending shopping lists by email
+
 0.006  2020-06-03 21:00:00  CZE/Prague
 
     - allow for renaming categories

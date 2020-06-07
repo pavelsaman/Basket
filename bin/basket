@@ -2,18 +2,19 @@
 
 use strict;
 use warnings;
-
+use lib './lib';
 use Readonly;
 use Pod::Usage;
 use Getopt::Long;
 use List::MoreUtils qw(uniq any);
 use Basket 0.005;
+use Email 0.001;
 
-our $VERSION = 0.006;
+our $VERSION = 0.007;
 
 sub print_usage {
     my $usage_line = <<'END_USAGE';
-Usage: basket [-l [-c category --before date --after date --dates]
+Usage: basket [-l [-c category --before date --after date --dates --send email]
                | -a -c category -i item
                | -d <-c category [ -i item ] | -i item>
                | --rename old:new ]
@@ -52,6 +53,9 @@ Options:
                      be used with --list.
     --dates         Prints when items were added along with their names. Could 
                      be used with --list.
+    --send          Sends a pretty printed shopping list to a given email
+                     addr. If the result (e.g. after applying filters) is
+                     an empty shopping list, the email won't be sent.
 
     --usage         Prints the usage line.
     --help          Prints this message.
@@ -80,20 +84,26 @@ sub pretty_print {
     my $data_ref    = shift;
     my $print_dates = shift;
 
+    my $pretty_shopping_list = q{};
+
     foreach my $cat (keys %$data_ref) {
         printf "%s:\n", $cat;
+        $pretty_shopping_list .= $cat . "\n";
         foreach my $item (@{ $data_ref->{$cat}} ) {
             my @item_parts = split /;/, $item;
             printf " %s", $item_parts[0];
+            $pretty_shopping_list .= " " . $item_parts[0];
             if ($print_dates) {
                 printf ";%s", $item_parts[1];
+                $pretty_shopping_list .= ";" . $item_parts[1];
             }
 
             print "\n";
+            $pretty_shopping_list .= "\n";
         }
     }
 
-    return;
+    return $pretty_shopping_list;
 }
 
 ###############################################################################
@@ -114,7 +124,8 @@ my $result = GetOptions(
     'after=s'              => \ my $after,
     'before=s'             => \ my $before,
     'dates'                => \ my $with_dates,
-    'rename=s'             => \ my $rename_category 
+    'rename=s'             => \ my $rename_category,
+    'send=s'               => \ my $email_addr  
 );
 
 # exactly one of --list, --delete, --add has to be given on the command line
@@ -155,7 +166,20 @@ if ($list) {
         $result = $basket->list({ before => $before, after => $after});
     }
     
-    pretty_print($result, $with_dates);
+    my $pretty_shopping_list = pretty_print($result, $with_dates);
+
+    if ($email_addr) {
+        if ($pretty_shopping_list) {
+            my $email = Email->new();
+            $email->send_email({
+                recipient     => $email_addr,
+                shopping_list => $pretty_shopping_list
+            });
+        }
+        else {
+            print "Empty shopping list, not sending an email.\n";
+        }        
+    }    
 }
 elsif ($add) {
     # both item(s) and category(ies) have to be specified
@@ -228,14 +252,14 @@ Basket - keep track of your shopping lists
 
 =head1 VERSION
 
-This document describes version 0.006
+This document describes version 0.007
 
 =head1 SYNOPSIS
 
-    Usage: basket [-l [-c category --before date --after date --dates]
-               | -a -c category -i item
-               | -d <-c category [ -i item ] | -i item>
-               | --rename old:new ]
+    Usage: basket [-l [-c category --before date --after date --dates --send email]
+                   | -a -c category -i item
+                   | -d <-c category [ -i item ] | -i item>
+                   | --rename old:new ]
 
     Options:
         -l|--list       Lists all items, could be combined with:
@@ -260,11 +284,14 @@ This document describes version 0.006
                          be used with --list.
         --dates         Prints when items were added along with their names. Could 
                          be used with --list.
+        --send          Sends a pretty printed shopping list to a given email
+                         addr. If the result (e.g. after applying filters) is
+                         an empty shopping list, the email won't be sent.
 
         --usage         Prints the usage line.
         --help          Prints this message.
         --man           Prints the whole man page.
-        --version       Prints the current version. 
+        --version       Prints the current version.
 
 =head1 DESCRIPTION
 
@@ -278,6 +305,7 @@ perform with your shopping lists:
     --list
     --add
     --delete
+    --rename
 
 For more information on how to use them, see the Examples section, SYNOPSIS, 
 help, or usage.
@@ -350,6 +378,24 @@ If you delete such an item:
     $ basket -d -c electronics -i "RJ-45 cable"
 
 it will wipe it out completely, I<NOT> descrease the quantity.
+
+To send a shopping list(s) to an email address:
+
+    $ basket -l --send shopping_list@pickitup.com
+    $ basket -l -c grocery --send shopping_list@pickitup.com
+    $ basket -l -c grocery -c kitchen --send shopping_list@pickitup.com
+
+Note that for sending emails, the following environment variables
+have to be set:
+
+    BASKET_SENDER        
+    BASKET_SERVER
+    BASKET_PORT    
+    BASKET_SECURITY=[ssl | starttls | 0]
+    BASKET_USER
+    BASKET_PWD   
+
+Option --send could be used with any option that also goes with --list.
 
 =head1 BUGS AND LIMITATIONS
 
