@@ -2,12 +2,12 @@ use Test::More qw(no_plan);
 use List::MoreUtils qw(any);
 use DateTime;
 
-use Basket;
+use Basket::Basket;
 
 ###############################################################################
 
 subtest 'Get Category Names' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });   
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });   
 
     my $all_cat_names = $basket->get_category_names();
     is(scalar @$all_cat_names, 2);
@@ -20,7 +20,7 @@ subtest 'Get Category Names' => sub {
 };
 
 subtest 'Create Basket When No Dir Is Passed' => sub {
-    my $basket = eval{ Basket->new({ }) };
+    my $basket = eval{ Basket::Basket->new({ }) };
     my $error = $@;
 
     is($basket, undef);
@@ -28,7 +28,7 @@ subtest 'Create Basket When No Dir Is Passed' => sub {
 };
 
 subtest 'Create Basket When Wrong Directory Is Passed' => sub {
-    my $basket = eval{ Basket->new({ dir => q{./t/dummy_file} }) };
+    my $basket = eval{ Basket::Basket->new({ dir => q{./t/dummy_file} }) };
     my $error = $@;
 
     is($basket, undef);
@@ -36,7 +36,7 @@ subtest 'Create Basket When Wrong Directory Is Passed' => sub {
 };
 
 subtest 'Get Correct Number Of Categories' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     my $categories = $basket->get_categories();
 
@@ -44,7 +44,7 @@ subtest 'Get Correct Number Of Categories' => sub {
 };
 
 subtest 'Get Correct Number Of Items' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     my $items = $basket->get_items();
 
@@ -52,7 +52,7 @@ subtest 'Get Correct Number Of Items' => sub {
 };
 
 subtest 'Get Correct Number Of Item Texts' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     my $items = $basket->get_item_texts();
 
@@ -60,7 +60,7 @@ subtest 'Get Correct Number Of Item Texts' => sub {
 };
 
 subtest 'Add New Item To Basket' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     $basket->add_item({
         text     => q{e},
@@ -74,7 +74,7 @@ subtest 'Add New Item To Basket' => sub {
 };
 
 subtest 'Add Existing Item - Quantity Increases, Date Changes' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
     
     $basket->add_item({
         text     => q{a},
@@ -93,7 +93,7 @@ subtest 'Add Existing Item - Quantity Increases, Date Changes' => sub {
 };
 
 subtest 'Add Item With No Text' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     eval{ $basket->add_item({ category => q{garage} }) };
     my $error = $@;
@@ -102,7 +102,7 @@ subtest 'Add Item With No Text' => sub {
 };
 
 subtest 'Add Item With No Category' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     eval{ $basket->add_item({ text => q{e} }) };    
     my $error = $@;
@@ -111,7 +111,7 @@ subtest 'Add Item With No Category' => sub {
 };
 
 subtest 'Delete Item From One Category' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     $basket->delete_item({
         text     => q{a},
@@ -126,7 +126,7 @@ subtest 'Delete Item From One Category' => sub {
 };
 
 subtest 'Delete Last Item From Category - Delete Category As Well' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     $basket->delete_item({
         text     => q{a},
@@ -145,7 +145,7 @@ subtest 'Delete Last Item From Category - Delete Category As Well' => sub {
 };
 
 subtest 'Delete Item - No Text Is Passed' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     eval{ $basket->delete_item({ }) };
     my $error = $@;
@@ -154,7 +154,7 @@ subtest 'Delete Item - No Text Is Passed' => sub {
 };
 
 subtest 'Delete Item From All Categories' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
     $basket->add_item({
         text     => q{a},
         category => q{kitchen}
@@ -170,7 +170,7 @@ subtest 'Delete Item From All Categories' => sub {
 };
 
 subtest 'Delete Category And All Its Items' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     $basket->delete_category({ category => q{electronics} });
 
@@ -182,7 +182,7 @@ subtest 'Delete Category And All Its Items' => sub {
 };
 
 subtest 'Delete Category - No Category Is Passed' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     eval{ $basket->delete_category({ }) };
     my $error = $@;

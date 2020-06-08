@@ -1,6 +1,6 @@
 use Test::More qw(no_plan);
 
-use Email;
+use Basket::Email;
 
 ###############################################################################
 
@@ -12,7 +12,7 @@ subtest 'Env Variable Are Not Set' => sub {
     delete $ENV{BASKET_SENDER};
     delete $ENV{BASKET_PWD};
 
-    my $email = eval{ Email->new() };
+    my $email = eval{ Basket::Email->new() };
     my $error = $@;
 
     is($email, undef);
@@ -27,7 +27,7 @@ subtest 'Env Variable Server Is Not Set' => sub {
     $ENV{BASKET_SENDER}   = 'pavelsam@centrum.cz';
     $ENV{BASKET_PWD}      = "secret";
 
-    my $email = eval{ Email->new() };
+    my $email = eval{ Basket::Email->new() };
     my $error = $@;
 
     is($email, undef);
@@ -42,7 +42,7 @@ subtest 'Env Variable Port Is Not Set' => sub {
     $ENV{BASKET_SENDER}   = 'pavelsam@centrum.cz';
     $ENV{BASKET_PWD}      = "secret";
 
-    my $email = eval{ Email->new() };
+    my $email = eval{ Basket::Email->new() };
     my $error = $@;
 
     is($email, undef);
@@ -57,7 +57,7 @@ subtest 'Env Variable Security Is Not Set' => sub {
     $ENV{BASKET_SENDER}   = 'pavelsam@centrum.cz';
     $ENV{BASKET_PWD}      = "secret";
 
-    my $email = eval{ Email->new() };
+    my $email = eval{ Basket::Email->new() };
     my $error = $@;
 
     is($email, undef);
@@ -72,7 +72,7 @@ subtest 'Env Variable User Is Not Set' => sub {
     $ENV{BASKET_SENDER}   = 'pavelsam@centrum.cz';
     $ENV{BASKET_PWD}      = "secret";
 
-    my $email = eval{ Email->new() };
+    my $email = eval{ Basket::Email->new() };
     my $error = $@;
 
     is($email, undef);
@@ -87,7 +87,7 @@ subtest 'Env Variable Sender Is Not Set' => sub {
     delete $ENV{BASKET_SENDER};
     $ENV{BASKET_PWD}      = "secret";
 
-    my $email = eval{ Email->new() };
+    my $email = eval{ Basket::Email->new() };
     my $error = $@;
 
     is($email, undef);
@@ -102,7 +102,7 @@ subtest 'Env Variable Pwd Is Not Set' => sub {
     $ENV{BASKET_SENDER}   = 'pavelsam@centrum.cz';
     delete $ENV{BASKET_PWD};
 
-    my $email = eval{ Email->new() };
+    my $email = eval{ Basket::Email->new() };
     my $error = $@;
 
     is($email, undef);
@@ -116,8 +116,8 @@ subtest 'Env Variable Is Set' => sub {
     $ENV{BASKET_USER}     = "pavelsam";
     $ENV{BASKET_PWD}      = "secret";
 
-    my $email = eval{ Email->new() };
+    my $email = eval{ Basket::Email->new() };
     my $error = $@;
 
-    isa_ok($email, q{Email});    
+    isa_ok($email, q{Basket::Email});    
 };

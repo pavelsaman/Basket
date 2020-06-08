@@ -1,5 +1,9 @@
 Revision history of basket app
 
+0.008  2020-06-08 20:00:00  CZE/Prague
+
+    - change structure, put classes into Basket::
+
 0.007  2020-06-07 19:00:00  CZE/Prague
 
     - sending shopping lists by email

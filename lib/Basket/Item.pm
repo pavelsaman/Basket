@@ -1,4 +1,4 @@
-package Item;
+package Basket::Item;
 
 use strict;
 use warnings;

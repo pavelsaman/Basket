@@ -1,11 +1,11 @@
 use Test::More qw(no_plan);
 
-use Basket;
+use Basket::Basket;
 
 ###############################################################################
 
 subtest 'Rename Category' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     $basket->rename_category({
         old => "electronics",

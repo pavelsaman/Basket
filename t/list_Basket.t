@@ -1,12 +1,12 @@
 use Test::More qw(no_plan);
 use List::MoreUtils qw(any);
 
-use Basket;
+use Basket::Basket;
 
 ###############################################################################
 
 subtest 'List Everything' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     my $result = $basket->list({ categories => [] });
 
@@ -17,7 +17,7 @@ subtest 'List Everything' => sub {
 };
 
 subtest 'Use --after Option' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     my $result = $basket->list({ categories => [], after => "2020-01-01" });
 
@@ -28,7 +28,7 @@ subtest 'Use --after Option' => sub {
 };
 
 subtest 'Use --before Option' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     my $result = $basket->list({ categories => [], before => "2020-02-02" });
 
@@ -39,7 +39,7 @@ subtest 'Use --before Option' => sub {
 };
 
 subtest 'Use --before and --after Option' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     my $result = $basket->list({
         categories => [],
@@ -54,7 +54,7 @@ subtest 'Use --before and --after Option' => sub {
 };
 
 subtest 'Use --after and --category Option' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     my $result = $basket->list({
         categories => ["kitchen"],
@@ -68,7 +68,7 @@ subtest 'Use --after and --category Option' => sub {
 };
 
 subtest 'Use --before and --category Option' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     my $result = $basket->list({
         categories => ["kitchen"],
@@ -82,7 +82,7 @@ subtest 'Use --before and --category Option' => sub {
 };
 
 subtest 'Use --before, --after, and --category Option' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     my $result = $basket->list({
         categories => ["electronics"],
@@ -97,7 +97,7 @@ subtest 'Use --before, --after, and --category Option' => sub {
 };
 
 subtest 'Use --before, --after, and --category Option - Two Categories' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     my $result = $basket->list({
         categories => ["electronics", "kitchen"],
@@ -112,7 +112,7 @@ subtest 'Use --before, --after, and --category Option - Two Categories' => sub {
 };
 
 subtest 'Use --before, --after, and --category Option - No Results' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     my $result = $basket->list({
         categories => ["electronics", "kitchen"],

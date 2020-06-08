@@ -1,4 +1,4 @@
-package Basket;
+package Basket::Basket;
 
 use strict;
 use warnings;
@@ -7,8 +7,8 @@ use DateTime;
 use Class::Std;
 use Carp qw(croak);
 use List::MoreUtils qw(duplicates any);
-use Item 0.002;
-use Category 0.002;
+use Basket::Item 0.002;
+use Basket::Category 0.002;
 
 our $VERSION = 0.005;
 
@@ -53,7 +53,7 @@ our $VERSION = 0.005;
         while (my $cat_file = readdir $basket_dir) {
             next BASKET_FILE if -d $cat_file;                       
 
-            my $new_category = Category->new({ name => $cat_file });               
+            my $new_category = Basket::Category->new({ name => $cat_file });               
             $basket{ident $self}->{
                 $new_category->get_name()}->{obj} = $new_category;
             $basket{ident $self}->{$new_category->get_name()}->{items}
@@ -83,7 +83,7 @@ our $VERSION = 0.005;
             next LINE if $parts[1] eq q{};
             next LINE if $parts[2] eq q{};
 
-            my $item = Item->new({
+            my $item = Basket::Item->new({
                 text     => $parts[1],
                 added    => $parts[2],
                 quantity => $parts[0]
@@ -155,7 +155,7 @@ our $VERSION = 0.005;
 
         # create new category
         if (not defined $basket{ident $self}->{$args_ref->{category}}) {
-            my $new_cat = Category->new({ name => $args_ref->{category} });
+            my $new_cat = Basket::Category->new({ name => $args_ref->{category} });
             $basket{ident $self}->{$args_ref->{category}}->{obj} = $new_cat;
         }        
 
@@ -173,7 +173,7 @@ our $VERSION = 0.005;
         }
         # new item
         else {
-            my $new_item = Item->new({ 
+            my $new_item = Basket::Item->new({ 
                 text     => $args_ref->{text},
                 added    => $now->ymd(),
                 quantity => 1

@@ -1,11 +1,11 @@
 use Test::More qw(no_plan);
 
-use Basket;
+use Basket::Basket;
 
 ###############################################################################
 
 subtest 'Save New Item' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
     my $items = $basket->get_items();
     my $categories = $basket->get_categories();
     is(scalar @$items, 4);
@@ -20,7 +20,7 @@ subtest 'Save New Item' => sub {
     $basket->save();
 
     # check it's been saved
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     my $items = $basket->get_items();
     my $categories = $basket->get_categories();
@@ -36,7 +36,7 @@ subtest 'Save New Item' => sub {
 };
 
 subtest 'Save New Item With New Category' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
     my $items = $basket->get_items();
     my $categories = $basket->get_categories();
     is(scalar @$items, 4);
@@ -51,7 +51,7 @@ subtest 'Save New Item With New Category' => sub {
     $basket->save();
 
     # check it's been saved
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     my $items = $basket->get_items();
     my $categories = $basket->get_categories();
@@ -67,7 +67,7 @@ subtest 'Save New Item With New Category' => sub {
 };
 
 subtest 'Delete Item' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
     my $items = $basket->get_items();
     my $categories = $basket->get_categories();
     is(scalar @$items, 4);
@@ -80,7 +80,7 @@ subtest 'Delete Item' => sub {
     # save changes
     $basket->save();
     # check it's been saved
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
     my $items = $basket->get_items();
     my $categories = $basket->get_categories();
     is(scalar @$items, 5);
@@ -94,7 +94,7 @@ subtest 'Delete Item' => sub {
     $basket->save();
 
     # check it's been deleted
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
     my $items = $basket->get_items();
     my $categories = $basket->get_categories();
     is(scalar @$items, 4);
@@ -102,7 +102,7 @@ subtest 'Delete Item' => sub {
 };
 
 subtest 'Delete Last Item - Category Gets Deletes As Well' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
     my $items = $basket->get_items();
     my $categories = $basket->get_categories();
     is(scalar @$items, 4);
@@ -115,7 +115,7 @@ subtest 'Delete Last Item - Category Gets Deletes As Well' => sub {
     # save changes
     $basket->save();
     # check it's been saved
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
     my $items = $basket->get_items();
     my $categories = $basket->get_categories();
     is(scalar @$items, 5);
@@ -129,7 +129,7 @@ subtest 'Delete Last Item - Category Gets Deletes As Well' => sub {
     $basket->save();
 
     # check it's been deleted
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
     my $items = $basket->get_items();
     my $categories = $basket->get_categories();
     is(scalar @$items, 4);

@@ -1,4 +1,4 @@
-package Category;
+package Basket::Category;
 
 use strict;
 use warnings;

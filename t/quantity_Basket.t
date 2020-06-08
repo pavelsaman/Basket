@@ -2,12 +2,12 @@ use Test::More qw(no_plan);
 use List::MoreUtils qw(any);
 use DateTime;
 
-use Basket;
+use Basket::Basket;
 
 ###############################################################################
 
 subtest 'List Quantity Of 1' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
 
     my $result = $basket->list({ categories => ["electronics"] });
 
@@ -16,7 +16,7 @@ subtest 'List Quantity Of 1' => sub {
 };
 
 subtest 'List Quantity Of 2' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
     $basket->add_item({
         text     => q{a},
         category => q{electronics}
@@ -30,7 +30,7 @@ subtest 'List Quantity Of 2' => sub {
 };
 
 subtest 'List Quantity Of 3' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
     $basket->add_item({
         text     => q{a},
         category => q{electronics}
@@ -48,7 +48,7 @@ subtest 'List Quantity Of 3' => sub {
 };
 
 subtest 'Add Item, Delete Item - No Quantity, No Item' => sub {
-    my $basket = Basket->new({ dir => q{./t/dummy_files} });
+    my $basket = Basket::Basket->new({ dir => q{./t/dummy_files} });
     $basket->add_item({
         text     => q{a},
         category => q{electronics}

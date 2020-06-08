@@ -30,14 +30,14 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>This document describes version 0.006</p>
+<p>This document describes version 0.008</p>
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
-<pre><code>    Usage: basket [-l [-c category --before date --after date --dates]
-               | -a -c category -i item
-               | -d &lt;-c category [ -i item ] | -i item&gt;
-               | --rename old:new ]
+<pre><code>    Usage: basket [-l [-c category --before date --after date --dates --send email]
+                   | -a -c category -i item
+                   | -d &lt;-c category [ -i item ] | -i item&gt;
+                   | --rename old:new ]
 
     Options:
         -l|--list       Lists all items, could be combined with:
@@ -62,11 +62,14 @@
                          be used with --list.
         --dates         Prints when items were added along with their names. Could 
                          be used with --list.
+        --send          Sends a pretty printed shopping list to a given email
+                         addr. If the result (e.g. after applying filters) is
+                         an empty shopping list, the email won&#39;t be sent.
 
         --usage         Prints the usage line.
         --help          Prints this message.
         --man           Prints the whole man page.
-        --version       Prints the current version. </code></pre>
+        --version       Prints the current version.</code></pre>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
@@ -76,7 +79,8 @@
 
 <pre><code>    --list
     --add
-    --delete</code></pre>
+    --delete
+    --rename</code></pre>
 
 <p>For more information on how to use them, see the Examples section, SYNOPSIS, help, or usage.</p>
 
@@ -141,6 +145,23 @@
 <pre><code>    $ basket -d -c electronics -i &quot;RJ-45 cable&quot;</code></pre>
 
 <p>it will wipe it out completely, <i>NOT</i> descrease the quantity.</p>
+
+<p>To send a shopping list(s) to an email address:</p>
+
+<pre><code>    $ basket -l --send shopping_list@pickitup.com
+    $ basket -l -c grocery --send shopping_list@pickitup.com
+    $ basket -l -c grocery -c kitchen --send shopping_list@pickitup.com</code></pre>
+
+<p>Note that for sending emails, the following environment variables have to be set:</p>
+
+<pre><code>    BASKET_SENDER        
+    BASKET_SERVER
+    BASKET_PORT    
+    BASKET_SECURITY=[ssl | starttls | 0]
+    BASKET_USER
+    BASKET_PWD   </code></pre>
+
+<p>Option --send could be used with any option that also goes with --list.</p>
 
 <h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
 

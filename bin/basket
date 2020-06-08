@@ -7,10 +7,10 @@ use Readonly;
 use Pod::Usage;
 use Getopt::Long;
 use List::MoreUtils qw(uniq any);
-use Basket 0.005;
-use Email 0.001;
+use Basket::Basket 0.005;
+use Basket::Email 0.001;
 
-our $VERSION = 0.007;
+our $VERSION = 0.008;
 
 sub print_usage {
     my $usage_line = <<'END_USAGE';
@@ -146,7 +146,7 @@ if (not defined $ENV{BASKET_DIR}) {
 my $basket_dir = $ENV{BASKET_DIR};
 $basket_dir =~ s{^[~]}{$ENV{HOME}}gxms;
 
-my $basket = Basket->new({ dir => $basket_dir});
+my $basket = Basket::Basket->new({ dir => $basket_dir});
 
 if ($list) {
     if (scalar @items != 0) {
@@ -170,7 +170,7 @@ if ($list) {
 
     if ($email_addr) {
         if ($pretty_shopping_list) {
-            my $email = Email->new();
+            my $email = Basket::Email->new();
             $email->send_email({
                 recipient     => $email_addr,
                 shopping_list => $pretty_shopping_list
@@ -252,7 +252,7 @@ Basket - keep track of your shopping lists
 
 =head1 VERSION
 
-This document describes version 0.007
+This document describes version 0.008
 
 =head1 SYNOPSIS
 

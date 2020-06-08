@@ -1,4 +1,4 @@
-package Email;
+package Basket::Email;
 
 use strict;
 use warnings;

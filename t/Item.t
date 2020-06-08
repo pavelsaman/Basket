@@ -1,17 +1,17 @@
 use Test::More qw(no_plan);
 
-use Item;
+use Basket::Item;
 
 ###############################################################################
 
 subtest 'Create New Item' => sub {
-    my $item = Item->new({
+    my $item = Basket::Item->new({
         text     => q{RJ45 cable},
         added    => q{2020-05-10},
         quantity => q{1}
     });
 
-    isa_ok($item, q{Item});
+    isa_ok($item, q{Basket::Item});
     is($item->get_text(), q{RJ45 cable});
     is($item->get_added_on(), q{2020-05-10});
     is($item->get_year(), q{2020});
@@ -20,7 +20,7 @@ subtest 'Create New Item' => sub {
 };
 
 subtest 'Item Is Newer Than - Positive Case' => sub {
-    my $item = Item->new({
+    my $item = Basket::Item->new({
         text     => q{RJ45 cable},
         added    => q{2020-05-10},
         quantity => q{1}
@@ -30,7 +30,7 @@ subtest 'Item Is Newer Than - Positive Case' => sub {
 };
 
 subtest 'Item Is Newer Than - Negative Case' => sub {
-    my $item = Item->new({
+    my $item = Basket::Item->new({
         text     => q{RJ45 cable},
         added    => q{2020-05-10},
         quantity => q{1}
@@ -40,7 +40,7 @@ subtest 'Item Is Newer Than - Negative Case' => sub {
 };
 
 subtest 'Item Is Newer Than - Edge Case: Same Date' => sub {
-    my $item = Item->new({
+    my $item = Basket::Item->new({
         text     => q{RJ45 cable},
         added    => q{2020-05-10},
         quantity => q{1}
@@ -50,7 +50,7 @@ subtest 'Item Is Newer Than - Edge Case: Same Date' => sub {
 };
 
 subtest 'Item Is Older Than - Positive Case' => sub {
-    my $item = Item->new({
+    my $item = Basket::Item->new({
         text     => q{RJ45 cable},
         added    => q{2020-05-10},
         quantity => q{1}
@@ -60,7 +60,7 @@ subtest 'Item Is Older Than - Positive Case' => sub {
 };
 
 subtest 'Item Is Older Than - Negative Case' => sub {
-    my $item = Item->new({
+    my $item = Basket::Item->new({
         text     => q{RJ45 cable},
         added    => q{2020-05-10},
         quantity => q{1}
@@ -70,7 +70,7 @@ subtest 'Item Is Older Than - Negative Case' => sub {
 };
 
 subtest 'Item Is Older Than - Edge Case: Same Date' => sub {
-    my $item = Item->new({
+    my $item = Basket::Item->new({
         text     => q{RJ45 cable},
         added    => q{2020-05-10},
         quantity => q{1}
@@ -80,7 +80,7 @@ subtest 'Item Is Older Than - Edge Case: Same Date' => sub {
 };
 
 subtest 'Item Is Created At - Positive Case' => sub {
-    my $item = Item->new({
+    my $item = Basket::Item->new({
         text     => q{RJ45 cable},
         added    => q{2020-05-10},
         quantity => q{1}
@@ -90,7 +90,7 @@ subtest 'Item Is Created At - Positive Case' => sub {
 };
 
 subtest 'Item Is Created At - Negative Case Past' => sub {
-    my $item = Item->new({
+    my $item = Basket::Item->new({
         text     => q{RJ45 cable},
         added    => q{2020-05-10},
         quantity => q{1}
@@ -100,7 +100,7 @@ subtest 'Item Is Created At - Negative Case Past' => sub {
 };
 
 subtest 'Item Is Created At - Negative Case Future' => sub {
-    my $item = Item->new({
+    my $item = Basket::Item->new({
         text     => q{RJ45 cable},
         added    => q{2020-05-10},
         quantity => q{1}
