@@ -6,11 +6,12 @@ use Readonly;
 use DateTime;
 use Class::Std;
 use Carp qw(croak);
+use Fcntl qw(:DEFAULT);
 use List::MoreUtils qw(duplicates any);
 use Basket::Item 0.002;
 use Basket::Category 0.002;
 
-our $VERSION = 0.006;
+our $VERSION = 0.007;
 
 {
     Readonly my $delimeter              => q{;};
@@ -77,7 +78,7 @@ our $VERSION = 0.006;
         my $self     = shift;
         my $cat_file = shift;        
 
-        open my $basket_file, q{<}, $cat_file or return;
+        sysopen my $basket_file, $cat_file, O_RDONLY or return;
 
         my $items = {};
         LINE:
@@ -360,8 +361,9 @@ our $VERSION = 0.006;
 
         CATEGORY:
         foreach my $cat (keys %{ $basket{ident $self} }) {
-            open my $cat_file, q{>}, $dir{ident $self} . q{/} . $cat
-                or next CATEGORY; 
+            sysopen my $cat_file, $dir{ident $self} . q{/} . $cat,
+                O_WRONLY|O_CREAT or next CATEGORY
+            ; 
 
             # save all items
             foreach my $item (keys %{ $basket{ident $self}->{$cat}->{items} }) {

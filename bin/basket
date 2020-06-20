@@ -7,10 +7,10 @@ use Readonly;
 use Pod::Usage;
 use Getopt::Long;
 use List::MoreUtils qw(uniq any);
-use Basket::Basket 0.006;
+use Basket::Basket 0.007;
 use Basket::Email 0.001;
 
-our $VERSION = 0.009;
+our $VERSION = 0.010;
 
 ###############################################################################
 
@@ -268,7 +268,7 @@ Basket - keep track of your shopping lists
 
 =head1 VERSION
 
-This document describes version 0.009
+This document describes version 0.010
 
 =head1 SYNOPSIS
 
