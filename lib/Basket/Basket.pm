@@ -10,11 +10,21 @@ use List::MoreUtils qw(duplicates any);
 use Basket::Item 0.002;
 use Basket::Category 0.002;
 
-our $VERSION = 0.005;
+our $VERSION = 0.006;
 
 {
-    Readonly my $delimeter       => q{;};
-    Readonly my $backup_file_ext => q{.bak};
+    Readonly my $delimeter              => q{;};
+    Readonly my $backup_file_ext        => q{.bak};
+    Readonly my $ALLOWED_CAT_NAME       => qr{
+        ^
+        ([a-z-]+)
+        $
+    }xmsi;
+    Readonly my $ALLOWED_FULL_FILE_NAME => qr{
+        ^
+        ([a-z-./_]+)
+        $
+    }xmsi;
 
     sub SAVED     :PRIVATE { 1 };
     sub NOT_SAVED :PRIVATE { 0 };
@@ -51,7 +61,7 @@ our $VERSION = 0.005;
 
         BASKET_FILE:
         while (my $cat_file = readdir $basket_dir) {
-            next BASKET_FILE if -d $cat_file;                       
+            next BASKET_FILE if -d $dir{ident $self} . q{/} . $cat_file;                       
 
             my $new_category = Basket::Category->new({ name => $cat_file });               
             $basket{ident $self}->{
@@ -333,10 +343,12 @@ our $VERSION = 0.005;
 
         BASKET_FILE:
         while (my $cat_file = readdir $basket_dir) {
-            next BASKET_FILE if -d $cat_file;                   
+            next BASKET_FILE if -d $dir{ident $self} . q{/} . $cat_file;            
+            my ($safe_file_name) = $cat_file =~ m{$ALLOWED_CAT_NAME}ig;                                     
             
-            rename $dir{ident $self} . q{/} . $cat_file,
-                   $dir{ident $self} . q{/} . $cat_file . $backup_file_ext;   
+            rename $dir{ident $self} . q{/} . $safe_file_name,
+                   $dir{ident $self} . q{/} . $safe_file_name . $backup_file_ext
+            ;   
         }        
 
         closedir $basket_dir;
@@ -370,7 +382,12 @@ our $VERSION = 0.005;
     sub _delete_backup_files :PRIVATE {
         my $self = shift;
 
-        unlink glob join q{}, $dir{ident $self}, q{/}, q{*}, $backup_file_ext;
+        my @files 
+            = glob join q{}, $dir{ident $self}, q{/}, q{*}, $backup_file_ext
+        ;        
+        my @safe_files = map { $_ =~ m{$ALLOWED_FULL_FILE_NAME}ig } @files;        
+
+        unlink @safe_files;
 
         return;
     }

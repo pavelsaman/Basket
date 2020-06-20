@@ -2,15 +2,25 @@
 
 use strict;
 use warnings;
-
+use lib './lib';
 use Readonly;
 use Pod::Usage;
 use Getopt::Long;
 use List::MoreUtils qw(uniq any);
-use Basket::Basket 0.005;
+use Basket::Basket 0.006;
 use Basket::Email 0.001;
 
-our $VERSION = 0.008;
+our $VERSION = 0.009;
+
+###############################################################################
+
+Readonly my $ALLOWED_DIR_NAME => qr{
+    ^
+    ([a-z-./_]+)
+    $
+}xmsi;
+
+###############################################################################
 
 sub print_usage {
     my $usage_line = <<'END_USAGE';
@@ -145,8 +155,14 @@ if (not defined $ENV{BASKET_DIR}) {
 # substitude "~" at the beginning for $HOME
 my $basket_dir = $ENV{BASKET_DIR};
 $basket_dir =~ s{^[~]}{$ENV{HOME}}gxms;
+my ($safe_basket_dir_name) = $basket_dir =~ m{$ALLOWED_DIR_NAME}ig;
 
-my $basket = Basket::Basket->new({ dir => $basket_dir});
+if (not defined $safe_basket_dir_name) {
+    print_usage();
+    exit 1;
+}
+
+my $basket = Basket::Basket->new({ dir => $safe_basket_dir_name});
 
 if ($list) {
     if (scalar @items != 0) {
@@ -252,7 +268,7 @@ Basket - keep track of your shopping lists
 
 =head1 VERSION
 
-This document describes version 0.008
+This document describes version 0.009
 
 =head1 SYNOPSIS
 
