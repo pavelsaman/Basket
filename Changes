@@ -1,5 +1,9 @@
 Revision history of basket app
 
+0.011  2020-06-21 11:00:00  CZE/Prague
+
+    - run() in main pkg
+
 0.010  2020-06-20 13:30:00  CZE/Prague
 
     - use sysopen instead of 3-arg open function

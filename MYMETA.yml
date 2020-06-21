@@ -22,5 +22,5 @@ requires:
   Email::Sender: '1.300034'
   Email::Simple: '2.216'
   Readonly: '2.05'
-version: 0.01
+version: 0.011
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

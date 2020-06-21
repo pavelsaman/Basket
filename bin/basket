@@ -10,7 +10,7 @@ use List::MoreUtils qw(uniq any);
 use Basket::Basket 0.007;
 use Basket::Email 0.001;
 
-our $VERSION = 0.010;
+our $VERSION = 0.011;
 
 ###############################################################################
 
@@ -116,143 +116,150 @@ sub pretty_print {
     return $pretty_shopping_list;
 }
 
-###############################################################################
+sub run {
+    # get command line options
+    my $result = GetOptions(
+        # meta-options
+        'usage'                => sub { print_usage();   exit 0; },
+        'help'                 => sub { print_help();    exit 0; },
+        'version'              => sub { print_version(); exit 0; },
+        'man'                  => sub { print_man();     exit 0; },
+        # behavioral options
+        'l|list'               => \ my $list,
+        'a|add'                => \ my $add,
+        'd|delete'             => \ my $delete,
+        'i|item=s{1,}'         => \ my @items,
+        'c|cat|category=s{1,}' => \ my @categories,
+        'after=s'              => \ my $after,
+        'before=s'             => \ my $before,
+        'dates'                => \ my $with_dates,
+        'rename=s'             => \ my $rename_category,
+        'send=s'               => \ my $email_addr  
+    );
 
-# get command line options
-my $result = GetOptions(
-    # meta-options
-    'usage'                => sub { print_usage();   exit 0; },
-    'help'                 => sub { print_help();    exit 0; },
-    'version'              => sub { print_version(); exit 0; },
-    'man'                  => sub { print_man();     exit 0; },
-    # behavioral options
-    'l|list'               => \ my $list,
-    'a|add'                => \ my $add,
-    'd|delete'             => \ my $delete,
-    'i|item=s{1,}'         => \ my @items,
-    'c|cat|category=s{1,}' => \ my @categories,
-    'after=s'              => \ my $after,
-    'before=s'             => \ my $before,
-    'dates'                => \ my $with_dates,
-    'rename=s'             => \ my $rename_category,
-    'send=s'               => \ my $email_addr  
-);
+    # exactly one of --list, --delete, --add has to be given on the command line
+    my @given_verbs = grep { $_ } ($list, $add, $delete, $rename_category);
 
-# exactly one of --list, --delete, --add has to be given on the command line
-my @given_verbs = grep { $_ } ($list, $add, $delete, $rename_category);
-
-if (scalar @given_verbs != 1) {
-    print_usage();
-    exit 1;
-}
-
-if (not defined $ENV{BASKET_DIR}) {
-    printf "%s\n%s\n", q{Environment variable BASKET_DIR is not set.},
-        q{Basket doesn't know where your shopping lists are.};
-    exit 1;
-}
-
-# substitude "~" at the beginning for $HOME
-my $basket_dir = $ENV{BASKET_DIR};
-$basket_dir =~ s{^[~]}{$ENV{HOME}}gxms;
-my ($safe_basket_dir_name) = $basket_dir =~ m{$ALLOWED_DIR_NAME}ig;
-
-if (not defined $safe_basket_dir_name) {
-    print_usage();
-    exit 1;
-}
-
-my $basket = Basket::Basket->new({ dir => $safe_basket_dir_name});
-
-if ($list) {
-    if (scalar @items != 0) {
+    if (scalar @given_verbs != 1) {
         print_usage();
         exit 1;
     }
 
-    my $result;    
-    if (scalar @categories > 0) {
-        $result = $basket->list({
-            categories => [uniq @categories],
-            before     => $before,
-            after      => $after
-        });
+    if (not defined $ENV{BASKET_DIR}) {
+        printf "%s\n%s\n", q{Environment variable BASKET_DIR is not set.},
+            q{Basket doesn't know where your shopping lists are.};
+        exit 1;
     }
-    else {
-        $result = $basket->list({ before => $before, after => $after});
-    }
-    
-    my $pretty_shopping_list = pretty_print($result, $with_dates);
 
-    if ($email_addr) {
-        if ($pretty_shopping_list) {
-            my $email = Basket::Email->new();
-            $email->send_email({
-                recipient     => $email_addr,
-                shopping_list => $pretty_shopping_list
+    # substitude "~" at the beginning for $HOME
+    my $basket_dir = $ENV{BASKET_DIR};
+    $basket_dir =~ s{^[~]}{$ENV{HOME}}gxms;
+    my ($safe_basket_dir_name) = $basket_dir =~ m{$ALLOWED_DIR_NAME}ig;
+
+    if (not defined $safe_basket_dir_name) {
+        print_usage();
+        exit 1;
+    }
+
+    my $basket = Basket::Basket->new({ dir => $safe_basket_dir_name});
+
+    if ($list) {
+        if (scalar @items != 0) {
+            print_usage();
+            exit 1;
+        }
+
+        my $result;    
+        if (scalar @categories > 0) {
+            $result = $basket->list({
+                categories => [uniq @categories],
+                before     => $before,
+                after      => $after
             });
         }
         else {
-            print "Empty shopping list, not sending an email.\n";
-        }        
-    }    
-}
-elsif ($add) {
-    # both item(s) and category(ies) have to be specified
-    # maximum 1 category can be specified
-    if (scalar @items == 0 or scalar @categories != 1) {
-        print_usage();
-        exit 1;
-    }
+            $result = $basket->list({ before => $before, after => $after});
+        }
+        
+        my $pretty_shopping_list = pretty_print($result, $with_dates);
 
-    # add all items into basket
-    foreach my $item (@items) {
-        $basket->add_item({ category => $categories[0], text => $item });
+        if ($email_addr) {
+            if ($pretty_shopping_list) {
+                my $email = Basket::Email->new();
+                $email->send_email({
+                    recipient     => $email_addr,
+                    shopping_list => $pretty_shopping_list
+                });
+            }
+            else {
+                print "Empty shopping list, not sending an email.\n";
+            }        
+        }    
     }
-}
-elsif ($rename_category) {
-    # parse it first old_cat:new_cat
-    my ($old, $new) = split /:/, $rename_category;
-    
-    # new has to be given
-    if (not $new) {
-        print_usage();
-        exit 1;
-    }
+    elsif ($add) {
+        # both item(s) and category(ies) have to be specified
+        # maximum 1 category can be specified
+        if (scalar @items == 0 or scalar @categories != 1) {
+            print_usage();
+            exit 1;
+        }
 
-    # old has to exist
-    my $category_names_ref = $basket->get_category_names();
-    if (not any { $_ eq $old } @$category_names_ref) {
-        print_usage();
-        exit 1;
-    }
-
-    $basket->rename_category({ old => $old, new => $new });
-}
-else {
-    # either item(s) or category(ies) has to be specified
-    if ((scalar @items > 1 and scalar @categories > 1)
-        or (scalar @items == 0 and scalar @categories == 0)) {
-        print_usage();
-        exit 1;
-    }    
-    
-    # more categories to delete
-    if (scalar @categories > 0 and scalar @items == 0) {
-        foreach my $category (@categories) {
-            $basket->delete_category({ category => $category });
+        # add all items into basket
+        foreach my $item (@items) {
+            $basket->add_item({ category => $categories[0], text => $item });
         }
     }
-    # delete item(s) from one category
-    else {
-        foreach my $item (@items) {
-            $basket->delete_item({ category => $categories[0], text => $item });
-        }        
+    elsif ($rename_category) {
+        # parse it first old_cat:new_cat
+        my ($old, $new) = split /:/, $rename_category;
+        
+        # new has to be given
+        if (not $new) {
+            print_usage();
+            exit 1;
+        }
+
+        # old has to exist
+        my $category_names_ref = $basket->get_category_names();
+        if (not any { $_ eq $old } @$category_names_ref) {
+            print_usage();
+            exit 1;
+        }
+
+        $basket->rename_category({ old => $old, new => $new });
     }
+    else {
+        # either item(s) or category(ies) has to be specified
+        if ((scalar @items > 1 and scalar @categories > 1)
+            or (scalar @items == 0 and scalar @categories == 0)) {
+            print_usage();
+            exit 1;
+        }    
+        
+        # more categories to delete
+        if (scalar @categories > 0 and scalar @items == 0) {
+            foreach my $category (@categories) {
+                $basket->delete_category({ category => $category });
+            }
+        }
+        # delete item(s) from one category
+        else {
+            foreach my $item (@items) {
+                $basket->delete_item({
+                    category => $categories[0],
+                    text => $item
+                });
+            }        
+        }
+    }
+    
+    # save changes
+    $basket->save();
 }
 
-# save changes
-$basket->save();
+###############################################################################
+
+run() if not caller;
 
 exit 0;
 
@@ -268,7 +275,7 @@ Basket - keep track of your shopping lists
 
 =head1 VERSION
 
-This document describes version 0.010
+This document describes version 0.011
 
 =head1 SYNOPSIS
 
