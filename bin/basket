@@ -30,7 +30,7 @@ Usage: basket [-l [-c category --before date --after date --dates --send email]
                | --rename old:new ]
 END_USAGE
 
-    printf "%s", $usage_line;
+    printf $usage_line;
 
     return;
 }
@@ -81,13 +81,15 @@ END_HELP_MSG_END
 }
 
 sub print_version {
-    printf "%s: %.3f\n", qq{basket version:}, qq{$VERSION};
+    printf "%s: %.3f\n", q{basket version:}, qq{$VERSION};
 
     return;
 }
 
 sub print_man {
     pod2usage(-exitval => 0, -verbose => 2);
+
+    return;
 }
 
 sub pretty_print {
@@ -102,10 +104,10 @@ sub pretty_print {
         foreach my $item (@{ $data_ref->{$cat}} ) {
             my @item_parts = split /;/, $item;
             printf " %s", $item_parts[0];
-            $pretty_shopping_list .= " " . $item_parts[0];
+            $pretty_shopping_list .= q{ } . $item_parts[0];
             if ($print_dates) {
                 printf ";%s", $item_parts[1];
-                $pretty_shopping_list .= ";" . $item_parts[1];
+                $pretty_shopping_list .= q{;} . $item_parts[1];
             }
 
             print "\n";
@@ -118,7 +120,7 @@ sub pretty_print {
 
 sub run {
     # get command line options
-    my $result = GetOptions(
+    GetOptions(
         # meta-options
         'usage'                => sub { print_usage();   exit 0; },
         'help'                 => sub { print_help();    exit 0; },
@@ -134,7 +136,7 @@ sub run {
         'before=s'             => \ my $before,
         'dates'                => \ my $with_dates,
         'rename=s'             => \ my $rename_category,
-        'send=s'               => \ my $email_addr  
+        'send=s'               => \ my $email_addr,
     );
 
     # exactly one of --list, --delete, --add has to be given on the command line
@@ -154,7 +156,7 @@ sub run {
     # substitude "~" at the beginning for $HOME
     my $basket_dir = $ENV{BASKET_DIR};
     $basket_dir =~ s{^[~]}{$ENV{HOME}}gxms;
-    my ($safe_basket_dir_name) = $basket_dir =~ m{$ALLOWED_DIR_NAME}ig;
+    my ($safe_basket_dir_name) = $basket_dir =~ m{$ALLOWED_DIR_NAME}xmsig;
 
     if (not defined $safe_basket_dir_name) {
         print_usage();
@@ -169,7 +171,7 @@ sub run {
             exit 1;
         }
 
-        my $result;    
+        my $result;
         if (scalar @categories > 0) {
             $result = $basket->list({
                 categories => [uniq @categories],
@@ -180,7 +182,7 @@ sub run {
         else {
             $result = $basket->list({ before => $before, after => $after});
         }
-        
+
         my $pretty_shopping_list = pretty_print($result, $with_dates);
 
         if ($email_addr) {
@@ -193,8 +195,8 @@ sub run {
             }
             else {
                 print "Empty shopping list, not sending an email.\n";
-            }        
-        }    
+            }
+        }
     }
     elsif ($add) {
         # both item(s) and category(ies) have to be specified
@@ -212,7 +214,7 @@ sub run {
     elsif ($rename_category) {
         # parse it first old_cat:new_cat
         my ($old, $new) = split /:/, $rename_category;
-        
+
         # new has to be given
         if (not $new) {
             print_usage();
@@ -234,8 +236,8 @@ sub run {
             or (scalar @items == 0 and scalar @categories == 0)) {
             print_usage();
             exit 1;
-        }    
-        
+        }
+
         # more categories to delete
         if (scalar @categories > 0 and scalar @items == 0) {
             foreach my $category (@categories) {
@@ -249,17 +251,21 @@ sub run {
                     category => $categories[0],
                     text => $item
                 });
-            }        
+            }
         }
     }
-    
+
     # save changes
     $basket->save();
+
+    return;
 }
 
 ###############################################################################
 
-run() if not caller;
+if (not caller) {
+    run();
+}
 
 exit 0;
 
@@ -434,7 +440,7 @@ L<https://github.com/pavelsaman/Basket>
 
 Pavel Saman C<pavelsam@centrum.cz>
 
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
 Copyright © 2020, Pavel Saman C<pavelsam@centrum.cz>. All rights reserved.
 
